@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STONEAGE SKY - 태초의 하늘</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Quill Editor (Rich Text) -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <!-- SweetAlert2 (Toast) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#f8fafc',
+                            primary: '#3b82f6', 
+                            gold: '#f59e0b',
+                            accent: '#ef4444', 
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans KR"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .ql-editor { min-height: 250px; font-family: 'Noto Sans KR', sans-serif; font-size: 1rem; color: #333; }
+        .ql-toolbar.ql-snow { border: 1px solid #e5e7eb; border-radius: 0.5rem 0.5rem 0 0; background: #f9fafb; }
+        .ql-container.ql-snow { border: 1px solid #e5e7eb; border-radius: 0 0 0.5rem 0.5rem; background: #fff; border-top: none; }
+
+        .tab-btn { transition: all 0.2s; }
+        .tab-btn.active { color: #f59e0b; border-bottom: 2px solid #f59e0b; font-weight: bold; }
+
+        .stat-bar { height: 10px; border-radius: 2px; overflow: hidden; display: flex; gap: 1px; }
+        .stat-bar-fill { height: 100%; flex: 1; border-radius: 1px; }
+
+        /* 페트 카드 스타일링 (Light Theme) */
+        .pet-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            color: #1e293b;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+        .pet-image-container {
+            background: #f1f5f9;
+            border-radius: 12px; border: 1px solid #e2e8f0;
+            padding: 1rem; display: flex; justify-content: center; align-items: center;
+            height: 160px;
+        }
+        .pet-stat-box {
+            background: #f8fafc; border: 1px solid #e2e8f0;
+            border-radius: 8px; padding: 0.5rem; text-align: center;
+        }
+    </style>
+</head>
+<body class="antialiased flex flex-col min-h-screen selection:bg-brand-gold selection:text-white">
+
+    <header class="fixed w-full z-50 glass-panel shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center cursor-pointer" onclick="navigate('home')">
+                    <span class="text-2xl font-black text-brand-primary tracking-tighter">STONEAGE <span class="text-brand-gold">SKY</span></span>
+                </div>
+                
+                <nav class="hidden md:flex space-x-6 lg:space-x-8">
+                    <button onclick="navigate('home')" class="text-gray-600 hover:text-brand-primary font-bold transition">홈</button>
+                    <button onclick="navigate('notice')" class="text-gray-600 hover:text-brand-primary font-bold transition">공지</button>
+                    <button onclick="navigate('patch')" class="text-gray-600 hover:text-brand-primary font-bold transition">패치노트</button>
+                    <button onclick="navigate('calendar')" class="text-gray-600 hover:text-brand-primary font-bold transition">캘린더</button>
+                    <button onclick="navigate('pets')" class="text-gray-600 hover:text-brand-primary font-bold transition">페트</button>
+                    <button onclick="navigate('characters')" class="text-gray-600 hover:text-brand-primary font-bold transition">캐릭/탑승</button>
+                    <button onclick="navigate('items')" class="text-gray-600 hover:text-brand-primary font-bold transition">아이템</button>
+                    <button onclick="navigate('exchange')" class="text-gray-600 hover:text-brand-primary font-bold transition">거래소</button>
+                </nav>
+
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-brand-primary text-2xl focus:outline-none"><i class="fas fa-bars"></i></button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden glass-panel border-t border-gray-100 shadow-lg absolute w-full">
+            <div class="flex flex-col px-4 py-2 space-y-2 bg-white">
+                <button onclick="navigate('home')" class="text-left py-3 text-gray-600 font-bold border-b border-gray-100">홈</button>
+                <button onclick="navigate('notice')" class="text-left py-3 text-gray-600 font-bold border-b border-gray-100">공지</button>
+                <button onclick="navigate('patch')" class="text-left py-3 text-gray-600 font-bold border-b border-gray-100">패치노트</button>
+                <button onclick="navigate('calendar')" class="text-left py-3 text-gray-600 font-bold border-b border-gray-100">캘린더</button>
+                <button onclick="navigate('pets')" class="text-left py-3 text-gray-600 font-bold border-b border-gray-100">페트</button>
+                <button onclick="navigate('characters')" class="text-left py-3 text-gray-600 font-bold border-b border-gray-100">캐릭/탑승</button>
+                <button onclick="navigate('items')" class="text-left py-3 text-gray-600 font-bold border-b border-gray-100">아이템</button>
+                <button onclick="navigate('exchange')" class="text-left py-3 text-gray-600 font-bold">거래소</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="flex-grow pt-20">
+        <!-- 동적으로 콘텐츠가 로드되는 영역 -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 py-8 text-center text-sm text-gray-500 mt-12">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2026 STONEAGE SKY. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- 통합 작성 모달 -->
+    <div id="crud-modal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm hidden items-center justify-center z-[100] px-4">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] fade-in border border-gray-100 overflow-hidden">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 id="modal-title" class="text-xl font-black text-gray-800">등록</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto" id="modal-body">
+                <!-- 동적 폼 영역 -->
+            </div>
+            <div class="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-5 py-2 rounded-lg text-gray-600 font-bold hover:bg-gray-200 transition">취소</button>
+                <button onclick="saveData()" class="px-5 py-2 bg-brand-primary text-white rounded-lg font-bold shadow-md hover:bg-blue-600 transition">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게시글 본문 보기 모달 -->
+    <div id="view-modal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm hidden items-center justify-center z-[100] px-4">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] fade-in border border-gray-100 overflow-hidden">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 id="view-title" class="text-2xl font-black text-gray-800 break-words pr-4"></h3>
+                <button onclick="closeViewModal()" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+            </div>
+            <div class="px-6 py-2 bg-gray-50 text-sm text-gray-500 border-b border-gray-100 flex justify-between">
+                <span id="view-date"></span>
+            </div>
+            <div class="p-8 overflow-y-auto text-gray-800 leading-relaxed ql-editor" id="view-body">
+                <!-- 에디터 내용 출력 영역 -->
+            </div>
+            <div class="p-5 border-t border-gray-100 bg-gray-50 flex justify-end">
+                <button onclick="closeViewModal()" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-bold hover:bg-gray-300 transition">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 사진 확대 모달 (라이트박스) -->
+    <div id="image-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center z-[200] px-4 py-6" onclick="closeImageModal()">
+        <button onclick="closeImageModal()" class="absolute top-4 right-4 md:top-8 md:right-8 text-white/50 hover:text-white text-5xl transition-colors leading-none">&times;</button>
+        <img id="enlarged-image" src="" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl transform scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA6-WVBhlZx8PA8qTmrDlR03O0lIvdoRDc",
+            authDomain: "fighting-dog.firebaseapp.com",
+            projectId: "fighting-dog",
+            storageBucket: "fighting-dog.firebasestorage.app",
+            messagingSenderId: "254470661072",
+            appId: "1:254470661072:web:56207d4a96e0af6459cfd5",
+            measurementId: "G-WLCQFQFE02"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Global State
+        window.db = db;
+        window.appData = { notices: [], patchnotes: [], calendars: [], pets: [], characters: [], items: [], exchange: [] };
+        window.currentPage = 'home';
+        window.currentModalCol = null;
+        window.editingId = null;
+        window.quillEditor = null;
+        window.tempImageData = {}; 
+        window.selectedChar = null;
+        window.currentExchangeTab = '구매';
+
+        const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true });
+
+        window.navigate = function(target) {
+            window.currentPage = target;
+            document.getElementById('mobile-menu').classList.add('hidden');
+            renderPage();
+            window.scrollTo(0, 0);
+        };
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        window.openImageModal = function(src) {
+            if(!src) return;
+            const modal = document.getElementById('image-modal');
+            const img = document.getElementById('enlarged-image');
+            img.src = src;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => img.classList.remove('scale-95'), 10);
+        };
+
+        window.closeImageModal = function() {
+            const modal = document.getElementById('image-modal');
+            const img = document.getElementById('enlarged-image');
+            img.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                img.src = '';
+            }, 300);
+        };
+
+        // 이미지 Base64 변환 공통 함수
+        window.handleImageSelect = function(event, key) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64 = e.target.result;
+                window.tempImageData[key] = base64;
+                const previewEl = document.getElementById(`preview-${key}`);
+                if(previewEl) {
+                    previewEl.innerHTML = `<img src="${base64}" class="w-full h-full object-cover rounded-lg">`;
+                }
+            };
+            reader.readAsDataURL(file);
+        };
+
+        async function initApp() {
+            try {
+                await signInAnonymously(auth);
+                await fetchData();
+                renderPage();
+            } catch (error) {
+                console.error("Firebase Init Error:", error);
+                Toast.fire({ icon: 'error', title: '서버 연결에 실패했습니다.' });
+            }
+        }
+
+        async function fetchData() {
+            const cols = ['notices', 'patchnotes', 'calendars', 'pets', 'characters', 'items', 'exchange'];
+            for (const col of cols) {
+                const q = query(collection(db, `artifacts/stoneage-sky/public/data/${col}`));
+                const snapshot = await getDocs(q);
+                // 가져온 후 createdAt 기준으로 메모리 정렬
+                let data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                data.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                window.appData[col] = data;
+            }
+        }
+
+        function renderPage() {
+            const main = document.getElementById('main-content');
+            let html = '';
+
+            if (window.currentPage === 'home') {
+                html = `
+                    <section class="relative h-[400px] md:h-[500px] flex items-center justify-center overflow-hidden">
+                        <!-- 요세미티 느낌의 고해상도 대자연 이미지 -->
+                        <div class="absolute inset-0 z-0 bg-gray-900">
+                            <img src="https://images.unsplash.com/photo-1426604966848-d7adac402bff?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" alt="background" class="w-full h-full object-cover object-center opacity-80">
+                        </div>
+                        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto fade-in flex justify-center items-center">
+                            <img src="1d9888c7-a24e-46cd-a07e-5e3ecec4f982.png" alt="STONEAGE SKY Logo" class="max-w-full h-auto drop-shadow-2xl md:max-w-2xl">
+                        </div>
+                    </section>
+
+                    <!-- 복구된 최근 게시물 3단 섹션 -->
+                    <section class="container mx-auto px-4 py-8 bg-white border-t border-gray-100 mt-12">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                            <!-- 공지사항 5개 -->
+                            <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                                <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
+                                    <h3 class="font-black text-gray-800 text-lg">최근 공지사항</h3>
+                                    <button onclick="navigate('notice')" class="text-xs text-brand-primary font-bold">더보기</button>
+                                </div>
+                                <ul class="space-y-3">
+                                    ${window.appData.notices.slice(0,5).map(item => `
+                                        <li class="flex justify-between cursor-pointer hover:text-brand-primary text-sm text-gray-700" onclick="viewPost('notices', '${item.id}')">
+                                            <span class="truncate pr-4">${item.title}</span>
+                                            <span class="text-xs text-gray-400 shrink-0">${new Date(item.createdAt).toLocaleDateString()}</span>
+                                        </li>
+                                    `).join('') || '<li class="text-sm text-gray-400 text-center py-2">등록된 글이 없습니다.</li>'}
+                                </ul>
+                            </div>
+                            <!-- 패치노트 5개 -->
+                            <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                                <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
+                                    <h3 class="font-black text-gray-800 text-lg">최근 패치노트</h3>
+                                    <button onclick="navigate('patch')" class="text-xs text-brand-primary font-bold">더보기</button>
+                                </div>
+                                <ul class="space-y-3">
+                                    ${window.appData.patchnotes.slice(0,5).map(item => `
+                                        <li class="flex justify-between cursor-pointer hover:text-brand-primary text-sm text-gray-700" onclick="viewPost('patchnotes', '${item.id}')">
+                                            <span class="truncate pr-4">${item.title}</span>
+                                            <span class="text-xs text-gray-400 shrink-0">${new Date(item.createdAt).toLocaleDateString()}</span>
+                                        </li>
+                                    `).join('') || '<li class="text-sm text-gray-400 text-center py-2">등록된 글이 없습니다.</li>'}
+                                </ul>
+                            </div>
+                            <!-- 캘린더 일정 5개 -->
+                            <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                                <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
+                                    <h3 class="font-black text-gray-800 text-lg">최근 일정</h3>
+                                    <button onclick="navigate('calendar')" class="text-xs text-brand-primary font-bold">더보기</button>
+                                </div>
+                                <ul class="space-y-3">
+                                    ${window.appData.calendars.slice(0,5).map(item => `
+                                        <li class="flex justify-between text-sm text-gray-700 items-center">
+                                            <span class="truncate font-bold">${item.title}</span>
+                                            <span class="text-xs bg-brand-gold/10 text-brand-gold px-2 py-1 rounded font-bold shrink-0">${item.startDate} ~ ${item.endDate}</span>
+                                        </li>
+                                    `).join('') || '<li class="text-sm text-gray-400 text-center py-2">등록된 일정이 없습니다.</li>'}
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                `;
+            } else if (['notice', 'patch'].includes(window.currentPage)) {
+                const title = window.currentPage === 'notice' ? '공지사항' : '패치노트';
+                const colName = window.currentPage === 'notice' ? 'notices' : 'patchnotes';
+                const data = window.appData[colName];
+
+                html = `
+                    <div class="container mx-auto px-4 py-12 max-w-5xl fade-in">
+                        <div class="flex justify-between items-end mb-6">
+                            <h2 class="text-3xl font-black text-gray-800">${title}</h2>
+                            <button onclick="openModal('${colName}')" class="px-5 py-2 bg-brand-primary text-white rounded-lg font-bold shadow-md hover:bg-blue-600 transition"><i class="fas fa-pen mr-2"></i>작성</button>
+                        </div>
+                        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm">
+                                        <th class="p-4 font-bold w-3/4">제목</th>
+                                        <th class="p-4 font-bold text-center w-32">작성일</th>
+                                        <th class="p-4 font-bold text-center w-24">관리</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    ${data.map(item => `
+                                        <tr class="hover:bg-gray-50 transition">
+                                            <td class="p-4 cursor-pointer" onclick="viewPost('${colName}', '${item.id}')"><span class="font-bold text-gray-800 hover:text-brand-primary transition">${item.title}</span></td>
+                                            <td class="p-4 text-center text-sm text-gray-500">${new Date(item.createdAt).toLocaleDateString()}</td>
+                                            <td class="p-4 text-center space-x-2">
+                                                <button onclick="openModal('${colName}', '${item.id}')" class="text-gray-400 hover:text-brand-primary"><i class="fas fa-edit"></i></button>
+                                                <button onclick="deleteData('${colName}', '${item.id}')" class="text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    `).join('') || `<tr><td colspan="3" class="text-center p-8 text-gray-500">등록된 글이 없습니다.</td></tr>`}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else if (window.currentPage === 'calendar') {
+                html = `
+                    <div class="container mx-auto px-4 py-12 max-w-5xl fade-in">
+                        <div class="flex justify-between items-end mb-6">
+                            <h2 class="text-3xl font-black text-gray-800">캘린더</h2>
+                            <button onclick="openModal('calendars')" class="px-5 py-2 bg-brand-primary text-white rounded-lg font-bold shadow-md hover:bg-blue-600 transition"><i class="fas fa-plus mr-2"></i>일정 등록</button>
+                        </div>
+                        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm">
+                                        <th class="p-4 font-bold w-1/2">일정 제목</th>
+                                        <th class="p-4 font-bold text-center w-1/4">시작일</th>
+                                        <th class="p-4 font-bold text-center w-1/4">종료일</th>
+                                        <th class="p-4 font-bold text-center w-24">관리</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    ${window.appData.calendars.map(item => `
+                                        <tr class="hover:bg-gray-50 transition">
+                                            <td class="p-4 font-bold text-gray-800">${item.title}</td>
+                                            <td class="p-4 text-center text-sm text-brand-primary font-bold">${item.startDate}</td>
+                                            <td class="p-4 text-center text-sm text-brand-accent font-bold">${item.endDate}</td>
+                                            <td class="p-4 text-center space-x-2">
+                                                <button onclick="deleteData('calendars', '${item.id}')" class="text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    `).join('') || `<tr><td colspan="4" class="text-center p-8 text-gray-500">등록된 일정이 없습니다.</td></tr>`}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else if (window.currentPage === 'pets') {
+                html = `
+                    <div class="container mx-auto px-4 py-12 max-w-6xl fade-in">
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                            <h2 class="text-3xl font-black text-gray-800">페트 도감</h2>
+                            <div class="flex w-full md:w-auto gap-2">
+                                <div class="relative flex-grow">
+                                    <input type="text" id="search-pet" placeholder="페트 이름 검색..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary bg-white shadow-sm" onkeyup="renderPets()">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                                <button onclick="openModal('pets')" class="px-5 py-2 bg-brand-primary text-white rounded-lg font-bold shadow-md hover:bg-blue-600 transition whitespace-nowrap"><i class="fas fa-plus mr-2"></i>등록</button>
+                            </div>
+                        </div>
+                        <div id="pet-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                    </div>
+                `;
+                setTimeout(renderPets, 0);
+            } else if (window.currentPage === 'characters') {
+                html = `
+                    <div class="container mx-auto px-4 py-12 max-w-5xl fade-in">
+                        <div class="flex justify-between items-end mb-6">
+                            <h2 class="text-3xl font-black text-gray-800">캐릭터 / 탑승</h2>
+                        </div>
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <!-- 캐릭터 리스트 -->
+                            <div class="w-full md:w-1/3 bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="font-bold text-lg text-gray-800">캐릭터 목록</h3>
+                                    <button onclick="addCharacter()" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg font-bold text-gray-600 transition"><i class="fas fa-plus mr-1"></i>추가</button>
+                                </div>
+                                <div class="space-y-2 max-h-[500px] overflow-y-auto pr-1" id="char-list"></div>
+                            </div>
+                            <!-- 탑승 페트 갤러리 -->
+                            <div class="w-full md:w-2/3 bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+                                <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+                                    <h3 class="font-bold text-lg text-gray-800" id="selected-char-name">캐릭터를 선택하세요</h3>
+                                    <button onclick="openModal('characters')" class="text-sm bg-brand-primary hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg font-bold shadow transition"><i class="fas fa-plus mr-1"></i>탑승 페트 등록</button>
+                                </div>
+                                <div id="char-pet-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                setTimeout(renderCharacters, 0);
+            } else if (window.currentPage === 'items') {
+                html = `
+                    <div class="container mx-auto px-4 py-12 max-w-6xl fade-in">
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                            <h2 class="text-3xl font-black text-gray-800">아이템 도감</h2>
+                            <div class="flex w-full md:w-auto gap-2">
+                                <div class="relative flex-grow">
+                                    <input type="text" id="search-item" placeholder="아이템 이름 검색..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary bg-white shadow-sm" onkeyup="renderItems()">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                                <button onclick="openModal('items')" class="px-5 py-2 bg-brand-primary text-white rounded-lg font-bold shadow-md hover:bg-blue-600 transition whitespace-nowrap"><i class="fas fa-plus mr-2"></i>등록</button>
+                            </div>
+                        </div>
+                        <div id="item-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+                    </div>
+                `;
+                setTimeout(renderItems, 0);
+            } else if (window.currentPage === 'exchange') {
+                html = `
+                    <div class="container mx-auto px-4 py-12 max-w-5xl fade-in">
+                        <div class="flex justify-between items-end mb-6">
+                            <h2 class="text-3xl font-black text-gray-800">거래소</h2>
+                            <button onclick="openModal('exchange')" class="px-5 py-2 bg-brand-primary text-white rounded-lg font-bold shadow-md hover:bg-blue-600 transition"><i class="fas fa-plus mr-2"></i>등록</button>
+                        </div>
+                        
+                        <div class="flex mb-4 border-b border-gray-200">
+                            <button id="tab-buy" onclick="switchExchangeTab('구매')" class="tab-btn active px-6 py-3 text-gray-500 font-bold hover:text-brand-gold text-lg">구매</button>
+                            <button id="tab-sell" onclick="switchExchangeTab('판매')" class="tab-btn px-6 py-3 text-gray-500 font-bold hover:text-brand-gold text-lg">판매</button>
+                            <button id="tab-instant" onclick="switchExchangeTab('즉시구매')" class="tab-btn px-6 py-3 text-gray-500 font-bold hover:text-brand-gold text-lg">즉시구매</button>
+                        </div>
+
+                        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm">
+                                        <th class="p-4 font-bold text-center w-24">분류</th>
+                                        <th class="p-4 font-bold text-center w-24">사진</th>
+                                        <th class="p-4 font-bold w-1/4">이름 (페트/아이템)</th>
+                                        <th class="p-4 font-bold">설명</th>
+                                        <th class="p-4 font-bold text-center w-32">금액 (VIP)</th>
+                                        <th class="p-4 font-bold text-center w-32">디스코드</th>
+                                        <th class="p-4 font-bold text-center w-24">관리</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="exchange-list" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+                setTimeout(() => switchExchangeTab('구매'), 0);
+            }
+
+            main.innerHTML = html;
+        }
+
+        function createColorBar(val, colorClass, emptyClass = 'bg-gray-200') {
+            const max = 10;
+            const safeVal = Math.min(Math.max(parseInt(val)||0, 0), max);
+            let divs = '';
+            for(let i=0; i<max; i++) {
+                divs += `<div class="stat-bar-fill ${i < safeVal ? colorClass : emptyClass}"></div>`;
+            }
+            return `<div class="stat-bar w-full max-w-[120px]">${divs}</div>`;
+        }
+
+        window.renderPets = function() {
+            const container = document.getElementById('pet-grid'); 
+            const searchTerm = (document.getElementById('search-pet')?.value || '').toLowerCase();
+            const filtered = window.appData.pets.filter(p => (p.name || '').toLowerCase().includes(searchTerm));
+
+            container.innerHTML = filtered.map(pet => {
+                const imgTag = pet.image ? `<img src="${pet.image}" onclick="openImageModal('${pet.image}')" class="max-w-full max-h-full object-contain cursor-pointer hover:scale-110 transition-transform drop-shadow-xl">` : `<i class="fas fa-paw text-5xl text-gray-300"></i>`;
+                
+                return `
+                <div class="pet-card group p-5">
+                    <div class="absolute top-3 right-3 hidden group-hover:flex gap-2 z-20 bg-white/90 backdrop-blur rounded p-1 border border-gray-200 shadow-sm">
+                        <button onclick="openModal('pets', '${pet.id}')" class="text-gray-500 hover:text-brand-primary px-1"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteData('pets', '${pet.id}')" class="text-gray-500 hover:text-red-500 px-1"><i class="fas fa-trash"></i></button>
+                    </div>
+                    
+                    <div class="flex gap-4 mb-4">
+                        <div class="w-[40%] flex flex-col gap-2">
+                            <div class="pet-image-container">${imgTag}</div>
+                            <div class="text-center">
+                                <span class="inline-block bg-gray-100 text-gray-600 text-[10px] px-3 py-1 rounded-full font-bold border border-gray-200">${pet.grade || '일반등급'}</span>
+                            </div>
+                        </div>
+                        <div class="w-[60%] flex flex-col justify-center gap-1.5">
+                            <h3 class="text-xl font-black text-gray-800 mb-1">${pet.name}</h3>
+                            <div class="flex items-center gap-2"><span class="text-blue-500 font-bold text-xs w-4">水</span> ${createColorBar(pet.attrWater, 'bg-blue-500')}</div>
+                            <div class="flex items-center gap-2"><span class="text-green-500 font-bold text-xs w-4">地</span> ${createColorBar(pet.attrEarth, 'bg-green-500')}</div>
+                            <div class="flex items-center gap-2"><span class="text-red-500 font-bold text-xs w-4">火</span> ${createColorBar(pet.attrFire, 'bg-red-500')}</div>
+                            <div class="flex items-center gap-2"><span class="text-yellow-500 font-bold text-xs w-4">風</span> ${createColorBar(pet.attrWind, 'bg-yellow-400')}</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <div class="text-[11px] font-bold text-gray-400 mb-1">초기치</div>
+                            <div class="grid grid-cols-4 gap-2">
+                                <div class="pet-stat-box"><div class="text-[10px] text-gray-500">공격</div><div class="font-bold text-gray-800">${pet.initAtk||0}</div></div>
+                                <div class="pet-stat-box"><div class="text-[10px] text-gray-500">방어</div><div class="font-bold text-gray-800">${pet.initDef||0}</div></div>
+                                <div class="pet-stat-box"><div class="text-[10px] text-gray-500">순발</div><div class="font-bold text-gray-800">${pet.initSpd||0}</div></div>
+                                <div class="pet-stat-box"><div class="text-[10px] text-gray-500">내구</div><div class="font-bold text-gray-800">${pet.initHp||0}</div></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[11px] font-bold text-brand-gold mb-1">성장률</div>
+                            <div class="grid grid-cols-4 gap-2">
+                                <div class="pet-stat-box border-brand-gold/30 bg-brand-gold/5"><div class="text-[10px] text-brand-gold/80">공격</div><div class="font-bold text-brand-gold">${pet.growAtk||0}</div></div>
+                                <div class="pet-stat-box border-brand-gold/30 bg-brand-gold/5"><div class="text-[10px] text-brand-gold/80">방어</div><div class="font-bold text-brand-gold">${pet.growDef||0}</div></div>
+                                <div class="pet-stat-box border-brand-gold/30 bg-brand-gold/5"><div class="text-[10px] text-brand-gold/80">순발</div><div class="font-bold text-brand-gold">${pet.growSpd||0}</div></div>
+                                <div class="pet-stat-box border-brand-gold/30 bg-brand-gold/5"><div class="text-[10px] text-brand-gold/80">내구</div><div class="font-bold text-brand-gold">${pet.growHp||0}</div></div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 flex justify-between items-center px-4">
+                            <span class="text-xs font-bold text-gray-500">총성장률</span>
+                            <span class="text-xl font-black text-brand-gold">${pet.totalGrow||0}</span>
+                        </div>
+                        <div class="flex justify-between items-center border-t border-gray-100 pt-3">
+                            <span class="text-sm font-bold text-gray-500">탑승</span>
+                            ${pet.rideable ? `<span class="bg-green-100 text-green-700 border border-green-200 text-xs px-3 py-1 rounded font-bold">✓ 가능</span>` : `<span class="bg-gray-100 text-gray-400 text-xs px-3 py-1 rounded font-bold">불가</span>`}
+                        </div>
+                        <div class="flex justify-between items-center pb-1">
+                            <span class="text-sm font-bold text-gray-500">획득처</span>
+                            <span class="text-sm font-bold text-gray-800">${pet.source || '-'}</span>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('') || `<div class="col-span-full text-center py-12 text-gray-500 bg-white rounded-xl shadow-sm border border-gray-200">등록된 페트가 없습니다.</div>`;
+        }
+
+        window.renderCharacters = function() {
+            const listEl = document.getElementById('char-list');
+            const gridEl = document.getElementById('char-pet-grid');
+            const chars = window.appData.characters || [];
+            const charNames = [...new Set(chars.map(c => c.charName).filter(Boolean))];
+
+            if(!window.selectedChar && charNames.length > 0) window.selectedChar = charNames[0];
+
+            listEl.innerHTML = charNames.map(name => `
+                <div class="flex items-center justify-between p-3 rounded-lg cursor-pointer border transition ${window.selectedChar === name ? 'bg-brand-primary text-white border-brand-primary shadow-md font-bold' : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'}" onclick="selectCharacter('${name}')">
+                    <span>${name}</span>
+                    <button onclick="deleteCharacterGroup('${name}', event)" class="text-xs opacity-50 hover:opacity-100 ${window.selectedChar === name ? 'text-white' : 'text-red-500'}"><i class="fas fa-times"></i></button>
+                </div>
+            `).join('') || `<div class="text-center text-sm text-gray-400 py-4">캐릭터가 없습니다.</div>`;
+
+            if(window.selectedChar) {
+                document.getElementById('selected-char-name').textContent = `${window.selectedChar} 탑승 페트`;
+                const relatedPets = chars.filter(c => c.charName === window.selectedChar);
+                gridEl.innerHTML = relatedPets.map(pet => `
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 text-center relative group shadow-sm hover:shadow-md transition">
+                        <div class="absolute top-1 right-1 hidden group-hover:flex z-10 bg-white/80 rounded p-1 shadow border border-gray-200">
+                            <button onclick="deleteData('characters', '${pet.id}')" class="text-red-500 hover:text-red-700 text-xs"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div class="w-20 h-20 mx-auto bg-white rounded-lg border border-gray-200 mb-2 p-1 flex items-center justify-center">
+                            ${pet.image ? `<img src="${pet.image}" onclick="openImageModal('${pet.image}')" class="w-full h-full object-contain cursor-pointer hover:scale-110 transition-transform">` : `<i class="fas fa-paw text-gray-300 text-2xl"></i>`}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('selected-char-name').textContent = '캐릭터를 선택하세요';
+                gridEl.innerHTML = '<div class="col-span-full text-center text-gray-400 py-8">목록이 비어있습니다.</div>';
+            }
+        }
+
+        window.selectCharacter = function(name) { window.selectedChar = name; renderCharacters(); }
+        window.addCharacter = function() {
+            const name = prompt("새로운 캐릭터 이름을 입력하세요.");
+            if(name && name.trim()) { window.selectedChar = name.trim(); renderCharacters(); }
+        }
+        window.deleteCharacterGroup = async function(name, event) {
+            event.stopPropagation();
+            if(!confirm(`'${name}' 캐릭터와 관련된 모든 정보를 삭제하시겠습니까?`)) return;
+            const chars = window.appData.characters.filter(c => c.charName === name);
+            for(let c of chars) await deleteDoc(doc(db, 'artifacts/stoneage-sky/public/data/characters', c.id));
+            if(window.selectedChar === name) window.selectedChar = null;
+            await fetchData(); renderCharacters();
+            Toast.fire({icon: 'success', title: '삭제되었습니다.'});
+        }
+
+        window.renderItems = function() {
+            const grid = document.getElementById('item-grid');
+            const searchTerm = (document.getElementById('search-item')?.value || '').toLowerCase();
+            const filteredItems = window.appData.items.filter(item => (item.name || '').toLowerCase().includes(searchTerm));
+
+            grid.innerHTML = filteredItems.map(item => `
+                <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition relative group text-center flex flex-col h-full">
+                    <div class="absolute top-2 right-2 hidden group-hover:flex gap-1 z-10 bg-white/90 rounded p-1 shadow border border-gray-100">
+                        <button onclick="openModal('items', '${item.id}')" class="text-brand-primary hover:text-blue-700 text-xs px-2 py-1"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteData('items', '${item.id}')" class="text-red-500 hover:text-red-700 text-xs px-2 py-1"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div class="w-16 h-16 mx-auto bg-gray-50 rounded-lg border border-gray-200 mb-3 flex items-center justify-center shrink-0">
+                        ${item.image ? `<img src="${item.image}" onclick="openImageModal('${item.image}')" class="w-full h-full object-contain drop-shadow cursor-pointer hover:scale-110 transition-transform">` : `<i class="fas fa-cube text-gray-300 text-xl"></i>`}
+                    </div>
+                    <h4 class="font-bold text-gray-800 mb-2 truncate">${item.name}</h4>
+                    <p class="text-xs text-gray-500 leading-relaxed bg-gray-50 p-2 rounded border border-gray-100 flex-grow text-left">${item.effect}</p>
+                </div>
+            `).join('') || `<div class="col-span-full text-center py-12 text-gray-500 bg-white rounded-xl shadow-sm border border-gray-200">등록된 아이템이 없습니다.</div>`;
+        }
+
+        window.switchExchangeTab = function(tab) {
+            window.currentExchangeTab = tab;
+            ['tab-buy', 'tab-sell', 'tab-instant'].forEach(id => { document.getElementById(id).classList.remove('active'); });
+            const tabMap = {'구매':'tab-buy', '판매':'tab-sell', '즉시구매':'tab-instant'};
+            document.getElementById(tabMap[tab]).classList.add('active');
+            renderExchangeList();
+        }
+
+        function renderExchangeList() {
+            const tbody = document.getElementById('exchange-list');
+            if(!tbody) return;
+            const filtered = window.appData.exchange.filter(i => i.type === window.currentExchangeTab);
+            const badgeColor = {'구매':'bg-blue-100 text-blue-700', '판매':'bg-red-100 text-red-700', '즉시구매':'bg-yellow-100 text-yellow-700'}[window.currentExchangeTab];
+
+            tbody.innerHTML = filtered.map(item => `
+                <tr class="hover:bg-gray-50 transition border-b border-gray-100">
+                    <td class="p-4 text-center"><span class="px-2 py-1 rounded text-xs font-bold ${badgeColor}">${item.type}</span></td>
+                    <td class="p-4 text-center">
+                        ${item.image ? `<img src="${item.image}" onclick="openImageModal('${item.image}')" class="w-10 h-10 object-cover rounded border border-gray-200 cursor-pointer hover:scale-110 transition-transform mx-auto shadow-sm">` : `<span class="text-xs text-gray-300">-</span>`}
+                    </td>
+                    <td class="p-4 font-bold text-gray-800">${item.name}</td>
+                    <td class="p-4 text-sm text-gray-600 truncate max-w-xs">${item.desc}</td>
+                    <td class="p-4 text-center font-black text-brand-gold">${item.price} VIP</td>
+                    <td class="p-4 text-center text-sm font-bold text-[#5865F2]"><i class="fab fa-discord mr-1"></i>${item.discord || '-'}</td>
+                    <td class="p-4 text-center space-x-2">
+                        <button onclick="deleteData('exchange', '${item.id}')" class="text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || `<tr><td colspan="7" class="text-center p-8 text-gray-500 bg-white rounded-b-xl">등록된 거래가 없습니다.</td></tr>`;
+        }
+
+        window.viewPost = function(col, id) {
+            const item = window.appData[col].find(i => i.id === id);
+            if(!item) return;
+            document.getElementById('view-title').textContent = item.title;
+            document.getElementById('view-date').textContent = `작성일: ${new Date(item.createdAt).toLocaleDateString()}`;
+            document.getElementById('view-body').innerHTML = item.content || '';
+            document.getElementById('view-modal').classList.remove('hidden');
+            document.getElementById('view-modal').classList.add('flex');
+            
+            document.querySelectorAll('#view-body img').forEach(img => {
+                img.style.cursor = 'pointer';
+                img.onclick = () => window.openImageModal(img.src);
+            });
+        }
+
+        window.closeViewModal = function() {
+            document.getElementById('view-modal').classList.add('hidden');
+            document.getElementById('view-modal').classList.remove('flex');
+        }
+
+        window.openModal = function(col, id = null) {
+            window.currentModalCol = col;
+            window.editingId = id;
+            window.tempImageData = {}; 
+            const modal = document.getElementById('crud-modal');
+            const titleEl = document.getElementById('modal-title');
+            const bodyEl = document.getElementById('modal-body');
+            
+            let item = {};
+            if (id) item = window.appData[col].find(i => i.id === id) || {};
+
+            titleEl.textContent = id ? '수정' : '등록';
+            let formHtml = '';
+
+            if (['notices', 'patchnotes'].includes(col)) {
+                formHtml = `
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">제목</label>
+                        <input type="text" id="field-title" value="${item.title || ''}" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-brand-primary transition shadow-sm">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">내용 (이미지 첨부 가능)</label>
+                        <div id="editor-container" class="bg-white"></div>
+                    </div>
+                `;
+                bodyEl.innerHTML = formHtml;
+                setTimeout(() => {
+                    window.quillEditor = new Quill('#editor-container', {
+                        theme: 'snow',
+                        modules: { toolbar: [ [{ 'header': [1, 2, 3, false] }], ['bold', 'italic', 'underline', 'strike'], [{ 'color': [] }, { 'background': [] }], ['image', 'link'], ['clean'] ] }
+                    });
+                    if(item.content) window.quillEditor.root.innerHTML = item.content;
+                }, 10);
+            } 
+            else if (col === 'calendars') {
+                formHtml = `
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">일정 제목</label>
+                        <input type="text" id="field-title" value="${item.title || ''}" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-brand-primary transition shadow-sm" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">시작일</label>
+                            <input type="date" id="field-start" value="${item.startDate || ''}" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-brand-primary transition shadow-sm" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">종료일</label>
+                            <input type="date" id="field-end" value="${item.endDate || ''}" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-brand-primary transition shadow-sm" required>
+                        </div>
+                    </div>
+                `;
+                bodyEl.innerHTML = formHtml;
+            }
+            else if (col === 'pets') {
+                const imgPreview = item.image ? `<img src="${item.image}" class="h-32 object-contain drop-shadow">` : `<i class="fas fa-image text-gray-300 text-4xl"></i>`;
+                if(item.image) window.tempImageData['image'] = item.image;
+
+                formHtml = `
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-inner">
+                        <div class="flex gap-6 mb-6">
+                            <div class="w-1/3">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">페트 이미지</label>
+                                <div class="w-full h-36 bg-white border border-gray-300 rounded-xl flex items-center justify-center cursor-pointer hover:bg-gray-50 transition shadow-sm" onclick="document.getElementById('file-pet').click()">
+                                    <div id="preview-image" class="w-full h-full flex items-center justify-center p-2">${imgPreview}</div>
+                                </div>
+                                <input type="file" id="file-pet" accept="image/*" onchange="handleImageSelect(event, 'image')" class="hidden">
+                                
+                                <label class="block text-xs font-bold text-gray-500 mb-1 mt-4">등급</label>
+                                <input type="text" id="field-grade" value="${item.grade || '일반등급'}" class="w-full bg-white border border-gray-300 rounded p-2 text-center text-sm outline-none shadow-sm text-gray-700 font-bold">
+                            </div>
+                            <div class="w-2/3 space-y-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 mb-1">이름</label>
+                                    <input type="text" id="field-name" value="${item.name || ''}" class="w-full bg-white border border-gray-300 text-gray-800 font-black text-xl rounded p-2 outline-none shadow-sm">
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div><label class="block text-[10px] text-blue-500 font-bold">水 (0~10)</label><input type="number" id="attr-water" value="${item.attrWater||0}" min="0" max="10" class="w-full bg-white border border-gray-300 rounded p-1 text-center shadow-sm"></div>
+                                    <div><label class="block text-[10px] text-green-500 font-bold">地 (0~10)</label><input type="number" id="attr-earth" value="${item.attrEarth||0}" min="0" max="10" class="w-full bg-white border border-gray-300 rounded p-1 text-center shadow-sm"></div>
+                                    <div><label class="block text-[10px] text-red-500 font-bold">火 (0~10)</label><input type="number" id="attr-fire" value="${item.attrFire||0}" min="0" max="10" class="w-full bg-white border border-gray-300 rounded p-1 text-center shadow-sm"></div>
+                                    <div><label class="block text-[10px] text-yellow-500 font-bold">風 (0~10)</label><input type="number" id="attr-wind" value="${item.attrWind||0}" min="0" max="10" class="w-full bg-white border border-gray-300 rounded p-1 text-center shadow-sm"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-2 border-b border-gray-300 pb-1">초기치</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="bg-white p-2 rounded border border-gray-300 text-center shadow-sm"><div class="text-[10px] text-gray-400">공격</div><input type="number" id="init-atk" value="${item.initAtk||''}" class="w-full bg-transparent text-gray-800 text-center outline-none font-bold"></div>
+                                    <div class="bg-white p-2 rounded border border-gray-300 text-center shadow-sm"><div class="text-[10px] text-gray-400">방어</div><input type="number" id="init-def" value="${item.initDef||''}" class="w-full bg-transparent text-gray-800 text-center outline-none font-bold"></div>
+                                    <div class="bg-white p-2 rounded border border-gray-300 text-center shadow-sm"><div class="text-[10px] text-gray-400">순발</div><input type="number" id="init-spd" value="${item.initSpd||''}" class="w-full bg-transparent text-gray-800 text-center outline-none font-bold"></div>
+                                    <div class="bg-white p-2 rounded border border-gray-300 text-center shadow-sm"><div class="text-[10px] text-gray-400">내구</div><input type="number" id="init-hp" value="${item.initHp||''}" class="w-full bg-transparent text-gray-800 text-center outline-none font-bold"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-brand-gold mb-2 border-b border-brand-gold/30 pb-1">성장률</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="bg-white p-2 rounded border border-brand-gold/30 text-center shadow-sm"><div class="text-[10px] text-brand-gold/60">공격</div><input type="number" step="0.001" id="grow-atk" value="${item.growAtk||''}" class="w-full bg-transparent text-brand-gold text-center outline-none font-bold"></div>
+                                    <div class="bg-white p-2 rounded border border-brand-gold/30 text-center shadow-sm"><div class="text-[10px] text-brand-gold/60">방어</div><input type="number" step="0.001" id="grow-def" value="${item.growDef||''}" class="w-full bg-transparent text-brand-gold text-center outline-none font-bold"></div>
+                                    <div class="bg-white p-2 rounded border border-brand-gold/30 text-center shadow-sm"><div class="text-[10px] text-brand-gold/60">순발</div><input type="number" step="0.001" id="grow-spd" value="${item.growSpd||''}" class="w-full bg-transparent text-brand-gold text-center outline-none font-bold"></div>
+                                    <div class="bg-white p-2 rounded border border-brand-gold/30 text-center shadow-sm"><div class="text-[10px] text-brand-gold/60">내구</div><input type="number" step="0.001" id="grow-hp" value="${item.growHp||''}" class="w-full bg-transparent text-brand-gold text-center outline-none font-bold"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 flex gap-4">
+                            <div class="flex-grow bg-white p-3 rounded border border-gray-300 flex items-center justify-between shadow-sm">
+                                <span class="text-xs font-bold text-gray-500">총성장률</span>
+                                <input type="number" step="0.001" id="total-grow" value="${item.totalGrow||''}" class="bg-transparent text-brand-gold text-xl font-black text-right outline-none w-24">
+                            </div>
+                            <div class="w-1/3 space-y-2">
+                                <div class="flex items-center gap-2 bg-white p-2 border border-gray-300 rounded shadow-sm">
+                                    <input type="checkbox" id="field-ride" ${item.rideable ? 'checked' : ''} class="w-4 h-4 rounded text-brand-primary">
+                                    <label class="text-sm font-bold text-gray-600">탑승 가능</label>
+                                </div>
+                                <div><input type="text" id="field-source" value="${item.source||''}" placeholder="획득처 (예: 페트 환생)" class="w-full bg-white border border-gray-300 text-gray-800 rounded p-1.5 text-sm outline-none shadow-sm font-bold"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                bodyEl.innerHTML = formHtml;
+            } 
+            else if (col === 'characters') {
+                if(!window.selectedChar) { alert('먼저 우측 상단에서 캐릭터를 추가 및 선택해주세요.'); closeModal(); return; }
+                const imgPreview = item.image ? `<img src="${item.image}" class="h-16 object-contain">` : `<i class="fas fa-image text-gray-300 text-2xl"></i>`;
+                if(item.image) window.tempImageData['image'] = item.image;
+
+                formHtml = `
+                    <div class="mb-4 text-center font-bold text-gray-700 bg-gray-100 py-2 rounded-lg">선택된 캐릭터: ${window.selectedChar}</div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">탑승 페트 사진 첨부</label>
+                        <div class="w-24 h-24 border border-gray-300 bg-gray-50 rounded-xl flex items-center justify-center cursor-pointer shadow-inner hover:bg-gray-100 transition mx-auto" onclick="document.getElementById('file-char').click()">
+                            <div id="preview-image" class="w-full h-full flex items-center justify-center p-1">${imgPreview}</div>
+                        </div>
+                        <input type="file" id="file-char" accept="image/*" onchange="handleImageSelect(event, 'image')" class="hidden">
+                    </div>
+                `;
+                bodyEl.innerHTML = formHtml;
+            } 
+            else if (col === 'items') {
+                const imgPreview = item.image ? `<img src="${item.image}" class="h-16 object-contain">` : `<i class="fas fa-image text-gray-300 text-2xl"></i>`;
+                if(item.image) window.tempImageData['image'] = item.image;
+
+                formHtml = `
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">아이템 사진 (선택)</label>
+                        <div class="w-24 h-24 border border-gray-300 bg-gray-50 rounded-xl flex items-center justify-center cursor-pointer shadow-inner hover:bg-gray-100 transition" onclick="document.getElementById('file-item').click()">
+                            <div id="preview-image" class="w-full h-full flex items-center justify-center p-1">${imgPreview}</div>
+                        </div>
+                        <input type="file" id="file-item" accept="image/*" onchange="handleImageSelect(event, 'image')" class="hidden">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">아이템명</label>
+                        <input type="text" id="field-name" value="${item.name || ''}" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none shadow-sm" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">효과 설명</label>
+                        <textarea id="field-effect" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none h-24 resize-none shadow-sm">${item.effect || ''}</textarea>
+                    </div>
+                `;
+                bodyEl.innerHTML = formHtml;
+            }
+            else if (col === 'exchange') {
+                const imgPreview = item.image ? `<img src="${item.image}" class="h-16 object-contain">` : `<i class="fas fa-image text-gray-300 text-2xl"></i>`;
+                if(item.image) window.tempImageData['image'] = item.image;
+
+                formHtml = `
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">사진 첨부 (선택)</label>
+                        <div class="w-24 h-24 border border-gray-300 bg-gray-50 rounded-xl flex items-center justify-center cursor-pointer shadow-inner hover:bg-gray-100 transition" onclick="document.getElementById('file-exchange').click()">
+                            <div id="preview-image" class="w-full h-full flex items-center justify-center p-1">${imgPreview}</div>
+                        </div>
+                        <input type="file" id="file-exchange" accept="image/*" onchange="handleImageSelect(event, 'image')" class="hidden">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">분류</label>
+                        <select id="field-type" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none font-bold shadow-sm">
+                            <option value="구매" ${window.currentExchangeTab==='구매'?'selected':''}>구매</option>
+                            <option value="판매" ${window.currentExchangeTab==='판매'?'selected':''}>판매</option>
+                            <option value="즉시구매" ${window.currentExchangeTab==='즉시구매'?'selected':''}>즉시구매</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">이름 (페트, 아이템)</label>
+                        <input type="text" id="field-name" value="${item.name || ''}" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none shadow-sm" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">금액 (VIP)</label>
+                        <input type="number" id="field-price" value="${item.price || ''}" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none text-brand-gold font-bold shadow-sm" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1"><i class="fab fa-discord text-[#5865F2] mr-1"></i>디스코드 닉네임</label>
+                        <input type="text" id="field-discord" value="${item.discord || ''}" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none text-gray-800 shadow-sm" placeholder="예: user#1234" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">설명</label>
+                        <textarea id="field-desc" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none resize-none h-24 shadow-sm" placeholder="상세 정보를 입력하세요">${item.desc || ''}</textarea>
+                    </div>
+                `;
+                bodyEl.innerHTML = formHtml;
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeModal = function() {
+            document.getElementById('crud-modal').classList.add('hidden');
+            document.getElementById('crud-modal').classList.remove('flex');
+            window.quillEditor = null;
+        };
+
+        window.saveData = async function() {
+            try {
+                const col = window.currentModalCol;
+                let data = {};
+
+                if (['notices', 'patchnotes'].includes(col)) {
+                    data.title = document.getElementById('field-title').value;
+                    data.content = window.quillEditor.root.innerHTML;
+                    if(!window.editingId) data.createdAt = Date.now();
+                    if(!data.title) throw "제목을 입력하세요.";
+                } 
+                else if (col === 'calendars') {
+                    data.title = document.getElementById('field-title').value;
+                    data.startDate = document.getElementById('field-start').value;
+                    data.endDate = document.getElementById('field-end').value;
+                    if(!window.editingId) data.createdAt = Date.now();
+                    if(!data.title || !data.startDate || !data.endDate) throw "모든 일정을 입력하세요.";
+                }
+                else if (col === 'pets') {
+                    data.name = document.getElementById('field-name').value;
+                    data.grade = document.getElementById('field-grade').value;
+                    data.image = window.tempImageData['image'] || '';
+                    data.attrWater = document.getElementById('attr-water').value;
+                    data.attrEarth = document.getElementById('attr-earth').value;
+                    data.attrFire = document.getElementById('attr-fire').value;
+                    data.attrWind = document.getElementById('attr-wind').value;
+                    data.initAtk = document.getElementById('init-atk').value;
+                    data.initDef = document.getElementById('init-def').value;
+                    data.initSpd = document.getElementById('init-spd').value;
+                    data.initHp = document.getElementById('init-hp').value;
+                    data.growAtk = document.getElementById('grow-atk').value;
+                    data.growDef = document.getElementById('grow-def').value;
+                    data.growSpd = document.getElementById('grow-spd').value;
+                    data.growHp = document.getElementById('grow-hp').value;
+                    data.totalGrow = document.getElementById('total-grow').value;
+                    data.rideable = document.getElementById('field-ride').checked;
+                    data.source = document.getElementById('field-source').value;
+                    if(!window.editingId) data.createdAt = Date.now();
+                    if(!data.name) throw "페트 이름을 입력하세요.";
+                } 
+                else if (col === 'characters') {
+                    data.charName = window.selectedChar;
+                    data.image = window.tempImageData['image'] || '';
+                    if(!window.editingId) data.createdAt = Date.now();
+                    if(!data.image) throw "사진을 첨부하세요.";
+                } 
+                else if (col === 'items') {
+                    data.name = document.getElementById('field-name').value;
+                    data.effect = document.getElementById('field-effect').value;
+                    data.image = window.tempImageData['image'] || '';
+                    if(!window.editingId) data.createdAt = Date.now();
+                    if(!data.name) throw "아이템명을 입력하세요.";
+                }
+                else if (col === 'exchange') {
+                    data.type = document.getElementById('field-type').value;
+                    data.name = document.getElementById('field-name').value;
+                    data.price = document.getElementById('field-price').value;
+                    data.discord = document.getElementById('field-discord').value;
+                    data.desc = document.getElementById('field-desc').value;
+                    data.image = window.tempImageData['image'] || '';
+                    if(!window.editingId) data.createdAt = Date.now();
+                    if(!data.name || !data.price || !data.discord) throw "이름, 금액, 디스코드 닉네임을 모두 입력하세요.";
+                }
+
+                if (window.editingId) {
+                    await updateDoc(doc(db, `artifacts/stoneage-sky/public/data/${col}`, window.editingId), data);
+                } else {
+                    await addDoc(collection(db, `artifacts/stoneage-sky/public/data/${col}`), data);
+                }
+
+                closeModal();
+                await fetchData();
+                renderPage();
+                Toast.fire({ icon: 'success', title: '저장되었습니다.' });
+
+            } catch (error) {
+                if(typeof error === 'string') Toast.fire({ icon: 'warning', title: error });
+                else { console.error(error); Toast.fire({ icon: 'error', title: '오류가 발생했습니다.' }); }
+            }
+        };
+
+        window.deleteData = async function(col, id) {
+            if (!confirm('정말 삭제하시겠습니까?')) return;
+            try {
+                await deleteDoc(doc(db, `artifacts/stoneage-sky/public/data/${col}`, id));
+                await fetchData();
+                renderPage();
+                Toast.fire({ icon: 'success', title: '삭제되었습니다.' });
+            } catch (error) {
+                console.error(error);
+                Toast.fire({ icon: 'error', title: '삭제 실패' });
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            
+            document.getElementById('crud-modal').addEventListener('click', (e) => {
+                if(e.target === e.currentTarget) closeModal();
+            });
+            document.getElementById('view-modal').addEventListener('click', (e) => {
+                if(e.target === e.currentTarget) closeViewModal();
+            });
+        });
+    </script>
+</body>
+</html>
