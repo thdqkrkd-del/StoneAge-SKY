@@ -85,7 +85,7 @@
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center h-20">
                 <div class="flex items-center cursor-pointer" onclick="navigate('home')">
-                    <span class="text-2xl font-black text-brand-primary tracking-tighter">STONEAGE <span class="text-brand-gold">SKY</span></span>
+                    <img src="1d9888c7-a24e-46cd-a07e-5e3ecec4f982.png" alt="STONEAGE SKY" class="h-14 w-auto object-contain drop-shadow-sm hover:scale-105 transition-transform">
                 </div>
                 
                 <nav class="hidden md:flex space-x-6 lg:space-x-8">
@@ -281,62 +281,57 @@
 
             if (window.currentPage === 'home') {
                 html = `
-                    <section class="relative h-[400px] md:h-[500px] flex items-center justify-center overflow-hidden">
-                        <!-- 요세미티 느낌의 고해상도 대자연 이미지 -->
-                        <div class="absolute inset-0 z-0 bg-gray-900">
-                            <img src="https://images.unsplash.com/photo-1426604966848-d7adac402bff?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" alt="background" class="w-full h-full object-cover object-center opacity-80">
-                        </div>
-                        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto fade-in flex justify-center items-center">
-                            <img src="1d9888c7-a24e-46cd-a07e-5e3ecec4f982.png" alt="STONEAGE SKY Logo" class="max-w-full h-auto drop-shadow-2xl md:max-w-2xl">
-                        </div>
+                    <!-- 메인 배너 영역 (너비 조절 및 모서리 둥글게) -->
+                    <section class="container mx-auto px-4 pt-8 pb-4 flex justify-center fade-in">
+                        <img src="Gemini_Generated_Image_4fot0k4fot0k4fot.png" alt="STONEAGE SKY" class="w-full max-w-6xl h-auto rounded-3xl shadow-xl border border-gray-200/50">
                     </section>
 
-                    <!-- 복구된 최근 게시물 3단 섹션 -->
-                    <section class="container mx-auto px-4 py-8 bg-white border-t border-gray-100 mt-12">
+                    <!-- 최근 게시물 3단 섹션 -->
+                    <section class="container mx-auto px-4 py-8 mb-12">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                             <!-- 공지사항 5개 -->
-                            <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                                <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
-                                    <h3 class="font-black text-gray-800 text-lg">최근 공지사항</h3>
-                                    <button onclick="navigate('notice')" class="text-xs text-brand-primary font-bold">더보기</button>
+                            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition">
+                                <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                                    <h3 class="font-black text-gray-800 text-lg flex items-center"><i class="fas fa-bullhorn text-brand-primary mr-2"></i>최근 공지사항</h3>
+                                    <button onclick="navigate('notice')" class="text-xs text-brand-primary font-bold hover:underline">더보기</button>
                                 </div>
                                 <ul class="space-y-3">
                                     ${window.appData.notices.slice(0,5).map(item => `
-                                        <li class="flex justify-between cursor-pointer hover:text-brand-primary text-sm text-gray-700" onclick="viewPost('notices', '${item.id}')">
-                                            <span class="truncate pr-4">${item.title}</span>
-                                            <span class="text-xs text-gray-400 shrink-0">${new Date(item.createdAt).toLocaleDateString()}</span>
+                                        <li class="flex justify-between cursor-pointer group" onclick="viewPost('notices', '${item.id}')">
+                                            <span class="truncate pr-4 text-sm text-gray-700 group-hover:text-brand-primary font-medium transition">${item.title}</span>
+                                            <span class="text-xs text-gray-400 shrink-0 font-medium">${new Date(item.createdAt).toLocaleDateString()}</span>
                                         </li>
-                                    `).join('') || '<li class="text-sm text-gray-400 text-center py-2">등록된 글이 없습니다.</li>'}
+                                    `).join('') || '<li class="text-sm text-gray-400 text-center py-4">등록된 글이 없습니다.</li>'}
                                 </ul>
                             </div>
                             <!-- 패치노트 5개 -->
-                            <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                                <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
-                                    <h3 class="font-black text-gray-800 text-lg">최근 패치노트</h3>
-                                    <button onclick="navigate('patch')" class="text-xs text-brand-primary font-bold">더보기</button>
+                            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition">
+                                <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                                    <h3 class="font-black text-gray-800 text-lg flex items-center"><i class="fas fa-wrench text-brand-primary mr-2"></i>최근 패치노트</h3>
+                                    <button onclick="navigate('patch')" class="text-xs text-brand-primary font-bold hover:underline">더보기</button>
                                 </div>
                                 <ul class="space-y-3">
                                     ${window.appData.patchnotes.slice(0,5).map(item => `
-                                        <li class="flex justify-between cursor-pointer hover:text-brand-primary text-sm text-gray-700" onclick="viewPost('patchnotes', '${item.id}')">
-                                            <span class="truncate pr-4">${item.title}</span>
-                                            <span class="text-xs text-gray-400 shrink-0">${new Date(item.createdAt).toLocaleDateString()}</span>
+                                        <li class="flex justify-between cursor-pointer group" onclick="viewPost('patchnotes', '${item.id}')">
+                                            <span class="truncate pr-4 text-sm text-gray-700 group-hover:text-brand-primary font-medium transition">${item.title}</span>
+                                            <span class="text-xs text-gray-400 shrink-0 font-medium">${new Date(item.createdAt).toLocaleDateString()}</span>
                                         </li>
-                                    `).join('') || '<li class="text-sm text-gray-400 text-center py-2">등록된 글이 없습니다.</li>'}
+                                    `).join('') || '<li class="text-sm text-gray-400 text-center py-4">등록된 글이 없습니다.</li>'}
                                 </ul>
                             </div>
                             <!-- 캘린더 일정 5개 -->
-                            <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                                <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
-                                    <h3 class="font-black text-gray-800 text-lg">최근 일정</h3>
-                                    <button onclick="navigate('calendar')" class="text-xs text-brand-primary font-bold">더보기</button>
+                            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition">
+                                <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                                    <h3 class="font-black text-gray-800 text-lg flex items-center"><i class="far fa-calendar-alt text-brand-primary mr-2"></i>최근 일정</h3>
+                                    <button onclick="navigate('calendar')" class="text-xs text-brand-primary font-bold hover:underline">더보기</button>
                                 </div>
                                 <ul class="space-y-3">
                                     ${window.appData.calendars.slice(0,5).map(item => `
-                                        <li class="flex justify-between text-sm text-gray-700 items-center">
-                                            <span class="truncate font-bold">${item.title}</span>
-                                            <span class="text-xs bg-brand-gold/10 text-brand-gold px-2 py-1 rounded font-bold shrink-0">${item.startDate} ~ ${item.endDate}</span>
+                                        <li class="flex flex-col text-sm text-gray-700">
+                                            <span class="truncate font-bold mb-1">${item.title}</span>
+                                            <span class="text-xs bg-brand-gold/10 text-brand-gold px-2 py-1 rounded font-bold self-start">${item.startDate} ~ ${item.endDate}</span>
                                         </li>
-                                    `).join('') || '<li class="text-sm text-gray-400 text-center py-2">등록된 일정이 없습니다.</li>'}
+                                    `).join('') || '<li class="text-sm text-gray-400 text-center py-4">등록된 일정이 없습니다.</li>'}
                                 </ul>
                             </div>
                         </div>
@@ -884,7 +879,7 @@
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-bold text-gray-700 mb-1">분류</label>
-                        <select id="field-type" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none font-bold shadow-sm">
+                        <select id="field-type" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none font-bold">
                             <option value="구매" ${window.currentExchangeTab==='구매'?'selected':''}>구매</option>
                             <option value="판매" ${window.currentExchangeTab==='판매'?'selected':''}>판매</option>
                             <option value="즉시구매" ${window.currentExchangeTab==='즉시구매'?'selected':''}>즉시구매</option>
@@ -892,19 +887,19 @@
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-bold text-gray-700 mb-1">이름 (페트, 아이템)</label>
-                        <input type="text" id="field-name" value="${item.name || ''}" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none shadow-sm" required>
+                        <input type="text" id="field-name" value="${item.name || ''}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none" required>
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-bold text-gray-700 mb-1">금액 (VIP)</label>
-                        <input type="number" id="field-price" value="${item.price || ''}" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none text-brand-gold font-bold shadow-sm" required>
+                        <input type="number" id="field-price" value="${item.price || ''}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none text-brand-gold font-bold" required>
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-bold text-gray-700 mb-1"><i class="fab fa-discord text-[#5865F2] mr-1"></i>디스코드 닉네임</label>
-                        <input type="text" id="field-discord" value="${item.discord || ''}" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none text-gray-800 shadow-sm" placeholder="예: user#1234" required>
+                        <input type="text" id="field-discord" value="${item.discord || ''}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none text-gray-800" placeholder="예: user#1234" required>
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-bold text-gray-700 mb-1">설명</label>
-                        <textarea id="field-desc" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none resize-none h-24 shadow-sm" placeholder="상세 정보를 입력하세요">${item.desc || ''}</textarea>
+                        <textarea id="field-desc" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none resize-none h-24" placeholder="상세 정보를 입력하세요">${item.desc || ''}</textarea>
                     </div>
                 `;
                 bodyEl.innerHTML = formHtml;
