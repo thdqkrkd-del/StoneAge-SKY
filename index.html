@@ -11,382 +11,392 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
-        /* 스크롤바 커스텀 */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: none; justify-content: center; align-items: center; z-index: 11000; backdrop-filter: blur(8px); }
+        #lightbox img { max-width: 95%; max-height: 95%; object-fit: contain; border-radius: 8px; }
         
-        /* 라이트박스 */
-        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 9999; backdrop-filter: blur(5px); }
-        #lightbox img { max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
-        #lightbox .close-btn { position: absolute; top: 20px; right: 30px; font-size: 40px; color: white; cursor: pointer; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-
-        /* 커스텀 색상 */
         .text-brand-gold { color: #d4af37; }
         .bg-brand-gold { background-color: #d4af37; }
-
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 에디터 스타일 */
-        [contenteditable="true"]:empty:before {
-            content: attr(placeholder);
-            color: #9ca3af;
-            pointer-events: none;
-            display: block; /* For Firefox */
-        }
+        [contenteditable="true"]:empty:before { content: attr(placeholder); color: #9ca3af; pointer-events: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .animate-spin { animation: spin 1s linear infinite; }
     </style>
 </head>
 <body class="text-gray-800 antialiased flex flex-col min-h-screen">
 
-    <!-- 로그인/회원가입 오버레이 -->
-    <div id="auth-overlay" class="fixed inset-0 bg-[url('KakaoTalk_20260514_002507728.jpg')] bg-cover bg-center z-[10000] flex justify-center items-center">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
-        <div class="bg-white/95 p-8 rounded-2xl shadow-2xl w-full max-w-sm relative z-10 fade-in border border-white/50">
-            <div class="text-center mb-6">
-                <!-- 새 로고 적용 및 스타일 조정 -->
-                <img src="1d9888c7-a24e-46cd-a07e-5e3ecec4f982.png" alt="Logo" class="h-24 mx-auto mb-3">
-                <h2 id="auth-title" class="text-2xl font-black text-gray-800">로그인</h2>
-                <p class="text-sm text-gray-500 mt-1">STONEAGE SKY에 오신 것을 환영합니다</p>
+    <!-- 무한 로딩 방지용 로더 -->
+    <div id="initial-loader" class="fixed inset-0 bg-white z-[12000] flex justify-center items-center">
+        <div class="text-center">
+            <div class="inline-block w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="text-gray-500 font-black tracking-tight">데이터 동기화 중...</p>
+        </div>
+    </div>
+
+    <!-- 사진 디자인을 완벽 반영한 로그인 오버레이 -->
+    <div id="auth-overlay" class="fixed inset-0 bg-[url('KakaoTalk_20260514_002507728.jpg')] bg-cover bg-center z-[10000] flex justify-center items-center hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md"></div>
+        <div class="bg-white/95 p-10 rounded-[2.5rem] shadow-2xl w-full max-w-sm relative z-10 fade-in border border-white/40">
+            <div class="text-center mb-10">
+                <img src="1d9888c7-a24e-46cd-a07e-5e3ecec4f982.png" alt="Logo" class="h-28 mx-auto mb-6">
+                <h2 id="auth-title" class="text-3xl font-black text-gray-800">로그인</h2>
+                <p id="auth-subtitle" class="text-sm font-bold text-gray-500 mt-2">STONEAGE SKY 서버에 오신 것을 환영합니다.</p>
             </div>
             
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-600 mb-1">아이디</label>
-                    <input type="text" id="auth-id" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="아이디 입력">
+            <div class="space-y-5">
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-gray-400 ml-1">아이디</label>
+                    <input type="text" id="auth-id" class="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition font-bold" placeholder="아이디 입력">
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-600 mb-1">비밀번호</label>
-                    <input type="password" id="auth-pw" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="비밀번호 입력">
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-gray-400 ml-1">비밀번호</label>
+                    <input type="password" id="auth-pw" class="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition font-bold" placeholder="비밀번호 입력">
                 </div>
-                <button onclick="handleAuthSubmit()" id="auth-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition duration-200">입장하기</button>
+                <div class="pt-2">
+                    <button onclick="window.handleAuthSubmit()" id="auth-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl shadow-xl transition transform active:scale-95 text-lg">
+                        입장하기
+                    </button>
+                    <p class="text-center text-[10px] text-gray-400 mt-3 font-bold">태초의 하늘, 전설의 시작 -></p>
+                </div>
             </div>
-            <div class="mt-4 text-center">
-                <button onclick="toggleAuthMode()" id="auth-toggle" class="text-sm text-blue-600 font-bold hover:underline">계정이 없으신가요? 회원가입</button>
+            
+            <div class="mt-8 text-center">
+                <button onclick="window.toggleAuthMode()" id="auth-toggle" class="text-sm text-blue-600 font-black hover:underline">계정이 없으신가요? 회원가입</button>
             </div>
         </div>
     </div>
 
-    <!-- 헤더 영역 -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div class="container mx-auto px-4 h-16 flex items-center justify-between">
-            <a href="#" onclick="showPage('home')" class="flex items-center gap-2 group">
-                <!-- 새 로고 적용 및 스타일 조정 -->
-                <img src="1d9888c7-a24e-46cd-a07e-5e3ecec4f982.png" alt="Logo" class="h-12 group-hover:scale-105 transition">
+    <!-- Header Section -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4 h-20 flex items-center justify-between">
+            <a href="#" onclick="window.showPage('home')" class="group flex items-center">
+                <img src="1d9888c7-a24e-46cd-a07e-5e3ecec4f982.png" alt="Logo" class="h-14 group-hover:scale-110 transition duration-300">
             </a>
-
-            <!-- 데스크탑 메인 메뉴 -->
-            <nav class="hidden md:flex items-center gap-1 font-bold text-gray-600 text-sm" id="desktop-nav">
-                <a href="#" onclick="showPage('home')" class="nav-btn px-4 py-2 rounded-lg hover:bg-gray-100 transition" data-target="home">홈</a>
-                <a href="#" onclick="showPage('notice')" class="nav-btn px-4 py-2 rounded-lg hover:bg-gray-100 transition" data-target="notice">공지사항</a>
-                <a href="#" onclick="showPage('patch')" class="nav-btn px-4 py-2 rounded-lg hover:bg-gray-100 transition" data-target="patch">패치노트</a>
-                <a href="#" onclick="showPage('calendar')" class="nav-btn px-4 py-2 rounded-lg hover:bg-gray-100 transition" data-target="calendar">캘린더</a>
-                <a href="#" onclick="showPage('pet')" class="nav-btn px-4 py-2 rounded-lg hover:bg-gray-100 transition" data-target="pet">페트 도감</a>
-                <a href="#" onclick="showPage('ride')" class="nav-btn px-4 py-2 rounded-lg hover:bg-gray-100 transition" data-target="ride">캐릭터/탑승</a>
-                <a href="#" onclick="showPage('item')" class="nav-btn px-4 py-2 rounded-lg hover:bg-gray-100 transition" data-target="item">아이템 도감</a>
-                <!-- 동적 메뉴 삽입 위치 -->
-                <span id="dynamic-nav"></span>
-                <a href="#" onclick="showPage('exchange')" class="nav-btn px-4 py-2 rounded-lg hover:bg-gray-100 transition" data-target="exchange">거래소</a>
+            <nav class="hidden lg:flex items-center gap-1 font-black text-gray-500" id="desktop-nav">
+                <a href="#" onclick="window.showPage('home')" class="nav-btn px-4 py-2 rounded-xl hover:bg-gray-100 transition" data-target="home">홈</a>
+                <a href="#" onclick="window.showPage('notice')" class="nav-btn px-4 py-2 rounded-xl hover:bg-gray-100 transition" data-target="notice">공지사항</a>
+                <a href="#" onclick="window.showPage('patch')" class="nav-btn px-4 py-2 rounded-xl hover:bg-gray-100 transition" data-target="patch">패치노트</a>
+                <a href="#" onclick="window.showPage('calendar')" class="nav-btn px-4 py-2 rounded-xl hover:bg-gray-100 transition" data-target="calendar">캘린더</a>
+                <a href="#" onclick="window.showPage('pet')" class="nav-btn px-4 py-2 rounded-xl hover:bg-gray-100 transition" data-target="pet">페트</a>
+                <a href="#" onclick="window.showPage('ride')" class="nav-btn px-4 py-2 rounded-xl hover:bg-gray-100 transition" data-target="ride">탑승</a>
+                <a href="#" onclick="window.showPage('item')" class="nav-btn px-4 py-2 rounded-xl hover:bg-gray-100 transition" data-target="item">아이템</a>
+                <span id="dynamic-nav-container" class="flex gap-1"></span>
+                <a href="#" onclick="window.showPage('exchange')" class="nav-btn px-4 py-2 rounded-xl hover:bg-gray-100 transition font-black text-blue-600" data-target="exchange">거래소</a>
             </nav>
-
             <div class="flex items-center gap-3">
-                <span id="user-info" class="hidden text-sm font-bold text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full"></span>
-                <button onclick="window.handleLogout()" id="logout-btn" class="hidden text-sm font-bold text-red-500 hover:text-red-600 px-2">로그아웃</button>
-                <button onclick="showAdminSettings()" id="admin-setting-btn" class="hidden text-gray-500 hover:text-blue-600 transition" title="게시판 관리"><i class="fas fa-crown text-xl"></i></button>
+                <div id="user-info-area" class="hidden flex items-center gap-3">
+                    <span id="user-info" class="text-xs font-black text-gray-700 bg-gray-100 px-4 py-2.5 rounded-full border border-gray-200"></span>
+                    <button onclick="window.handleLogout()" class="text-xs font-black text-red-500 hover:underline">로그아웃</button>
+                    <button onclick="window.showAdminSettings()" id="admin-setting-btn" class="hidden text-gray-300 hover:text-blue-600 transition ml-2"><i class="fas fa-crown text-xl"></i></button>
+                </div>
             </div>
         </div>
     </header>
 
+    <!-- Main Content Area -->
     <main class="flex-grow container mx-auto px-4 py-8">
-        
-        <!-- 홈 화면 -->
+        <!-- Home Section -->
         <section id="page-home" class="page-section fade-in">
-            <!-- 메인 배너 -->
-            <div class="max-w-5xl mx-auto rounded-2xl overflow-hidden shadow-2xl mb-12 relative group bg-black">
-                <img src="Gemini_Generated_Image_4fot0k4fot0k4fot.png" class="w-full h-auto object-cover opacity-90" alt="Main Banner">
+            <!-- 배너 크기 확장: max-w-6xl -> max-w-7xl, 비율 조정 -->
+            <div class="max-w-7xl mx-auto rounded-[2.5rem] overflow-hidden shadow-2xl mb-12 bg-black relative group">
+                <img src="Gemini_Generated_Image_4fot0k4fot0k4fot.png" class="w-full h-full object-cover opacity-90 transition duration-1000 group-hover:scale-105" alt="Banner">
+                <!-- 하단 그라데이션 효과 추가로 텍스트 가독성 및 깊이감 부여 -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
             </div>
-
-            <!-- 3단 게시판 (홈) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                    <div class="flex justify-between items-center border-b pb-3 mb-3">
-                        <h3 class="font-black text-lg text-blue-600"><i class="fas fa-bullhorn mr-2"></i>최근 공지사항</h3>
-                        <button onclick="showPage('notice')" class="text-xs text-gray-400 hover:text-gray-600 font-bold">더보기</button>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8">
+                    <div class="flex justify-between items-center border-b border-blue-50 pb-5 mb-5">
+                        <h3 class="font-black text-xl text-blue-600 flex items-center"><i class="fas fa-bullhorn mr-3"></i>공지사항</h3>
+                        <button onclick="window.showPage('notice')" class="text-xs font-bold text-gray-400 hover:text-blue-500 transition">더보기</button>
                     </div>
-                    <ul id="home-notice-list" class="space-y-2 text-sm"></ul>
+                    <ul id="home-notice-list" class="space-y-4"></ul>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                    <div class="flex justify-between items-center border-b pb-3 mb-3">
-                        <h3 class="font-black text-lg text-green-600"><i class="fas fa-wrench mr-2"></i>최근 패치노트</h3>
-                        <button onclick="showPage('patch')" class="text-xs text-gray-400 hover:text-gray-600 font-bold">더보기</button>
+                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8">
+                    <div class="flex justify-between items-center border-b border-green-50 pb-5 mb-5">
+                        <h3 class="font-black text-xl text-green-600 flex items-center"><i class="fas fa-wrench mr-3"></i>패치노트</h3>
+                        <button onclick="window.showPage('patch')" class="text-xs font-bold text-gray-400 hover:text-green-500 transition">더보기</button>
                     </div>
-                    <ul id="home-patch-list" class="space-y-2 text-sm"></ul>
+                    <ul id="home-patch-list" class="space-y-4"></ul>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                    <div class="flex justify-between items-center border-b pb-3 mb-3">
-                        <h3 class="font-black text-lg text-purple-600"><i class="fas fa-calendar-alt mr-2"></i>예정된 일정</h3>
-                        <button onclick="showPage('calendar')" class="text-xs text-gray-400 hover:text-gray-600 font-bold">더보기</button>
+                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8">
+                    <div class="flex justify-between items-center border-b border-purple-50 pb-5 mb-5">
+                        <h3 class="font-black text-xl text-purple-600 flex items-center"><i class="fas fa-calendar-alt mr-3"></i>주요 일정</h3>
+                        <button onclick="window.showPage('calendar')" class="text-xs font-bold text-gray-400 hover:text-purple-500 transition">더보기</button>
                     </div>
-                    <ul id="home-calendar-list" class="space-y-3 text-sm font-medium"></ul>
+                    <ul id="home-calendar-list" class="space-y-4"></ul>
                 </div>
             </div>
         </section>
 
-        <!-- 통합 게시판 (공지/패치노트/동적) -->
+        <!-- Board Section (Integrated) -->
         <section id="page-board" class="page-section hidden fade-in max-w-5xl mx-auto">
-            <div class="flex justify-between items-end mb-6">
-                <h2 id="board-title" class="text-3xl font-black text-gray-800">게시판</h2>
-                <button onclick="showWriteModal()" class="admin-only hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold shadow transition flex items-center"><i class="fas fa-pen mr-2"></i>글쓰기</button>
+            <div class="flex justify-between items-center mb-10">
+                <h2 id="board-title" class="text-4xl font-black text-gray-800 tracking-tighter">게시판</h2>
+                <button onclick="window.showWriteModal()" class="admin-only hidden bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-2xl font-black shadow-xl transition flex items-center"><i class="fas fa-edit mr-2"></i>글쓰기</button>
             </div>
-            <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                <table class="w-full text-left border-collapse">
+            <div class="bg-white border border-gray-100 rounded-[2rem] shadow-xl overflow-hidden">
+                <table class="w-full text-left">
                     <thead>
-                        <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm">
-                            <th class="p-4 font-bold">제목</th>
-                            <th class="p-4 font-bold text-center w-32">작성일</th>
-                            <th class="admin-only hidden p-4 font-bold text-center w-24">관리</th>
+                        <tr class="bg-gray-50/50 border-b border-gray-50 text-gray-400 text-[10px] font-black uppercase tracking-widest">
+                            <th class="p-8">제목</th>
+                            <th class="p-8 text-center w-40">날짜</th>
+                            <th class="admin-only hidden p-8 text-center w-24">관리</th>
                         </tr>
                     </thead>
-                    <tbody id="board-list" class="divide-y divide-gray-100"></tbody>
+                    <tbody id="board-list" class="divide-y divide-gray-50"></tbody>
                 </table>
             </div>
         </section>
 
-        <!-- 글 작성 모달 (새 디자인 반영) -->
-        <div id="write-modal" class="fixed inset-0 bg-black/60 hidden justify-center items-center z-[150] p-4 backdrop-blur-sm transition-opacity">
-            <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden fade-in">
-                <div class="p-4 border-b flex justify-between items-center bg-gray-50">
-                    <h3 id="write-modal-title" class="text-lg font-bold text-gray-800">등록</h3>
-                    <button onclick="closeModal('write-modal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
-                </div>
-                <div class="p-6 overflow-y-auto flex-grow bg-white">
-                    <div class="mb-4">
-                        <label class="block text-sm font-bold text-gray-700 mb-1">제목</label>
-                        <input type="text" id="write-title" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 transition" placeholder="제목을 입력하세요">
-                    </div>
-                    
-                    <div class="mb-2">
-                        <label class="block text-sm font-bold text-gray-700 mb-1">내용 (이미지 첨부 가능)</label>
-                        <!-- 에디터 툴바 -->
-                        <div class="border border-gray-300 border-b-0 rounded-t flex items-center gap-1 p-2 bg-gray-50 text-gray-600">
-                            <button onclick="document.execCommand('bold')" class="p-1.5 hover:bg-gray-200 rounded" title="굵게"><i class="fas fa-bold"></i></button>
-                            <button onclick="document.execCommand('italic')" class="p-1.5 hover:bg-gray-200 rounded" title="기울임"><i class="fas fa-italic"></i></button>
-                            <button onclick="document.execCommand('underline')" class="p-1.5 hover:bg-gray-200 rounded" title="밑줄"><i class="fas fa-underline"></i></button>
-                            <button onclick="document.execCommand('strikeThrough')" class="p-1.5 hover:bg-gray-200 rounded" title="취소선"><i class="fas fa-strikethrough"></i></button>
-                            <div class="w-px h-5 bg-gray-300 mx-1"></div>
-                            <label class="cursor-pointer p-1.5 hover:bg-gray-200 rounded text-blue-600 font-bold" title="사진 삽입">
-                                <i class="fas fa-image"></i>
-                                <input type="file" class="hidden" accept="image/*" onchange="handleEditorImageUpload(event)">
-                            </label>
-                        </div>
-                        <!-- 에디터 입력창 -->
-                        <div id="write-content" class="w-full h-[400px] p-4 border border-gray-300 rounded-b focus:outline-none focus:ring-1 focus:ring-blue-500 overflow-y-auto whitespace-pre-wrap text-sm" contenteditable="true" placeholder="내용을 자유롭게 작성하세요..."></div>
-                    </div>
-                </div>
-                <div class="p-4 border-t bg-gray-50 flex justify-end gap-2">
-                    <button onclick="closeModal('write-modal')" class="px-5 py-2 rounded font-bold text-gray-600 hover:bg-gray-200 transition">취소</button>
-                    <button onclick="saveBoardPost()" class="px-5 py-2 rounded font-bold text-white bg-blue-600 hover:bg-blue-700 shadow transition">저장</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 캘린더 (일정) -->
-        <section id="page-calendar" class="page-section hidden fade-in max-w-5xl mx-auto">
-            <div class="flex justify-between items-end mb-6">
-                <h2 class="text-3xl font-black text-gray-800">캘린더 (일정)</h2>
-                <button onclick="showDataModal('calendar')" class="admin-only hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold shadow transition flex items-center"><i class="fas fa-pen mr-2"></i>일정 등록</button>
-            </div>
-            <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm">
-                            <th class="p-4 font-bold">일정명</th>
-                            <th class="p-4 font-bold text-center w-48">기간</th>
-                            <th class="admin-only hidden p-4 font-bold text-center w-24">관리</th>
-                        </tr>
-                    </thead>
-                    <tbody id="calendar-list" class="divide-y divide-gray-100"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- 글/일정 보기 팝업 -->
-        <div id="view-modal" class="fixed inset-0 bg-black/60 hidden justify-center items-center z-[100] p-4 backdrop-blur-sm transition-opacity">
-            <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden fade-in">
-                <div class="p-6 border-b flex justify-between items-center bg-gray-50">
-                    <div>
-                        <h3 id="view-modal-title" class="text-2xl font-black text-gray-800">제목</h3>
-                        <p id="view-modal-date" class="text-sm font-bold text-blue-600 mt-1">날짜/기간</p>
-                    </div>
-                    <button onclick="closeModal('view-modal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-2xl"></i></button>
-                </div>
-                <div id="view-modal-content" class="p-8 overflow-y-auto flex-grow text-gray-800 leading-relaxed whitespace-pre-wrap text-sm md:text-base">내용</div>
-            </div>
-        </div>
-
-        <!-- 페트 도감 -->
-        <section id="page-pet" class="page-section hidden fade-in max-w-6xl mx-auto">
-            <div class="flex justify-between items-end mb-6">
-                <h2 class="text-3xl font-black text-gray-800">페트 도감</h2>
-                <button onclick="showDataModal('pet')" class="admin-only hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold shadow transition flex items-center"><i class="fas fa-plus mr-2"></i>페트 등록</button>
-            </div>
-            <div class="mb-6 relative">
-                <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
-                <input type="text" id="pet-search" oninput="window.filterPets()" class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition" placeholder="페트 이름을 검색하세요...">
-            </div>
-            <div id="pet-gallery" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
-        </section>
-
-        <!-- 캐릭터 / 탑승 -->
-        <section id="page-ride" class="page-section hidden fade-in max-w-6xl mx-auto">
-            <div class="flex justify-between items-end mb-6">
-                <h2 class="text-3xl font-black text-gray-800">캐릭터 / 탑승</h2>
-            </div>
-            
-            <div class="flex flex-col md:flex-row gap-6">
-                <div class="w-full md:w-1/3 bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex flex-col h-[650px]">
-                    <div class="flex justify-between items-center mb-4 border-b pb-2">
-                        <h3 class="font-black text-lg text-gray-800">캐릭터 목록</h3>
-                        <button onclick="showDataModal('character')" class="admin-only hidden text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-2 py-1 rounded">+ 추가</button>
-                    </div>
-                    <div class="relative mb-3">
-                        <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
-                        <input type="text" id="char-search" oninput="window.filterCharacters()" class="w-full pl-8 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded focus:outline-none focus:border-blue-500 transition" placeholder="캐릭터 검색">
-                    </div>
-                    <ul id="character-list" class="flex-grow overflow-y-auto space-y-1 pr-1 custom-scrollbar"></ul>
-                </div>
-
-                <div class="w-full md:w-2/3 bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex flex-col h-[650px]">
-                    <div class="flex justify-between items-center mb-4 border-b pb-2">
-                        <h3 id="ride-title" class="font-black text-lg text-blue-600">탑승 가능한 페트</h3>
-                        <button onclick="showDataModal('ride')" class="admin-only hidden bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-bold shadow transition">+ 탑승 페트 등록</button>
-                    </div>
-                    <div class="relative mb-4">
-                        <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
-                        <input type="text" id="ride-pet-search" oninput="window.filterRidePets()" class="w-full pl-8 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded focus:outline-none focus:border-blue-500 transition" placeholder="페트 이름으로 검색">
-                    </div>
-                    <div id="ride-pet-gallery" class="flex-grow overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-4 content-start pr-1 custom-scrollbar"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 아이템 도감 -->
-        <section id="page-item" class="page-section hidden fade-in max-w-6xl mx-auto">
-            <div class="flex justify-between items-end mb-6">
-                <h2 class="text-3xl font-black text-gray-800">아이템 도감</h2>
-                <button onclick="showDataModal('items')" class="admin-only hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold shadow transition flex items-center"><i class="fas fa-plus mr-2"></i>아이템 등록</button>
-            </div>
-            <div class="mb-6 relative">
-                <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
-                <input type="text" id="item-search" oninput="window.filterItems()" class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition" placeholder="아이템 이름을 검색하세요...">
-            </div>
-            <div id="item-gallery" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
-        </section>
-
-        <!-- 거래소 -->
+        <!-- Exchange Section -->
         <section id="page-exchange" class="page-section hidden fade-in max-w-6xl mx-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-black text-gray-800">거래소</h2>
-                <button onclick="showDataModal('exchange')" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-bold shadow-md transition flex items-center"><i class="fas fa-plus mr-2"></i>등록</button>
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-4xl font-black text-gray-800">거래소</h2>
+                <button onclick="window.showDataModal('exchange')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-black shadow-xl transition transform active:scale-95 flex items-center"><i class="fas fa-plus mr-3"></i>물품 등록</button>
             </div>
-
-            <div class="flex border-b border-gray-200 mb-6" id="exchange-tabs">
-                <button onclick="switchExchangeTab('구매')" id="tab-buy" class="px-6 py-3 font-bold text-gray-500 border-b-2 border-transparent hover:text-gray-800 transition">구매</button>
-                <button onclick="switchExchangeTab('판매')" id="tab-sell" class="px-6 py-3 font-bold text-gray-500 border-b-2 border-transparent hover:text-gray-800 transition">판매</button>
-                <button onclick="switchExchangeTab('즉시구매')" id="tab-instant" class="px-6 py-3 font-bold text-gray-500 border-b-2 border-transparent hover:text-gray-800 transition">즉시구매</button>
+            <div class="flex gap-4 border-b border-gray-100 mb-8 overflow-x-auto" id="exchange-tabs">
+                <button onclick="window.switchExchangeTab('구매')" id="tab-buy" class="px-8 py-4 font-black text-gray-400 border-b-4 border-transparent transition">구매</button>
+                <button onclick="window.switchExchangeTab('판매')" id="tab-sell" class="px-8 py-4 font-black text-gray-400 border-b-4 border-transparent transition">판매</button>
+                <button onclick="window.switchExchangeTab('즉시구매')" id="tab-instant" class="px-8 py-4 font-black text-gray-400 border-b-4 border-transparent transition">즉시구매</button>
             </div>
-
-            <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm">
-                            <th class="p-4 font-bold text-center w-24">분류</th>
-                            <th class="p-4 font-bold text-center w-24">사진</th>
-                            <th class="p-4 font-bold w-1/4">이름 (페트/아이템)</th>
-                            <th class="p-4 font-bold">설명</th>
-                            <th class="p-4 font-bold text-center w-32">금액 (VIP)</th>
-                            <th class="p-4 font-bold text-center w-32">디스코드</th>
-                            <th class="p-4 font-bold text-center w-24">관리</th>
+            <div class="bg-white border border-gray-100 rounded-[2rem] shadow-xl overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <tr>
+                            <th class="p-6 text-center w-28">분류</th>
+                            <th class="p-6 text-center w-28">사진</th>
+                            <th class="p-6 w-1/4">물품명</th>
+                            <th class="p-6">설명</th>
+                            <th class="p-6 text-center w-36">금액(VIP)</th>
+                            <th class="p-6 text-center w-36">디스코드</th>
+                            <th class="p-6 text-center w-24">관리</th>
                         </tr>
                     </thead>
-                    <tbody id="exchange-list" class="divide-y divide-gray-100"></tbody>
+                    <tbody id="exchange-list" class="divide-y divide-gray-50"></tbody>
                 </table>
             </div>
         </section>
 
-        <!-- 관리자 설정 모달 (카테고리 관리) -->
-        <div id="admin-modal" class="fixed inset-0 bg-black/60 hidden justify-center items-center z-[200] p-4 backdrop-blur-sm transition-opacity">
-            <div class="bg-white rounded-xl w-full max-w-lg shadow-2xl overflow-hidden fade-in">
-                <div class="p-4 border-b flex justify-between items-center bg-gray-50">
-                    <h3 class="text-lg font-black text-gray-800"><i class="fas fa-crown text-brand-gold mr-2"></i>관리자 설정 (게시판 관리)</h3>
-                    <button onclick="closeModal('admin-modal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
-                </div>
-                <div class="p-6">
-                    <div class="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <h4 class="font-bold text-sm text-gray-700 mb-3">새 게시판 추가</h4>
-                        <div class="flex gap-2">
-                            <input type="text" id="new-cat-name" class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" placeholder="메뉴 이름 (예: 퀘스트)">
-                            <input type="text" id="new-cat-id" class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" placeholder="영문 ID (예: quest)">
-                            <button onclick="addCategory()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold text-sm shadow">추가</button>
-                        </div>
+        <!-- Pet/Item Gallery Sections -->
+        <section id="page-pet" class="page-section hidden fade-in max-w-6xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-4xl font-black text-gray-800">페트 도감</h2>
+                <button onclick="window.showDataModal('pet')" class="admin-only hidden bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-black shadow-lg transition">+ 페트 등록</button>
+            </div>
+            <div class="mb-10 relative">
+                <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="pet-search" oninput="window.filterPets()" class="w-full pl-16 pr-6 py-5 bg-white border border-gray-100 rounded-3xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold" placeholder="페트 이름을 입력하세요...">
+            </div>
+            <div id="pet-gallery" class="grid grid-cols-2 lg:grid-cols-4 gap-8"></div>
+        </section>
+
+        <section id="page-item" class="page-section hidden fade-in max-w-6xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-4xl font-black text-gray-800">아이템 도감</h2>
+                <button onclick="window.showDataModal('items')" class="admin-only hidden bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-black shadow-lg transition">+ 아이템 등록</button>
+            </div>
+            <div id="item-gallery" class="grid grid-cols-2 md:grid-cols-5 gap-6"></div>
+        </section>
+
+        <!-- Ride Section -->
+        <section id="page-ride" class="page-section hidden fade-in max-w-6xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-4xl font-black text-gray-800">캐릭터 / 탑승</h2>
+            </div>
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="w-full lg:w-1/3 bg-white border border-gray-100 rounded-[2rem] shadow-xl p-8 h-[750px] flex flex-col">
+                    <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                        <h3 class="font-black text-2xl text-gray-800">캐릭터 목록</h3>
+                        <button onclick="window.showDataModal('character')" class="admin-only hidden text-xs font-black text-blue-600 bg-blue-50 px-4 py-2 rounded-xl hover:bg-blue-100 transition">+ 추가</button>
                     </div>
-                    <div>
-                        <h4 class="font-bold text-sm text-gray-700 mb-2">현재 추가된 게시판</h4>
-                        <ul id="admin-cat-list" class="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded p-2"></ul>
+                    <ul id="character-list" class="flex-grow overflow-y-auto space-y-3 pr-2 custom-scrollbar"></ul>
+                </div>
+                <div class="w-full lg:w-2/3 bg-white border border-gray-100 rounded-[2rem] shadow-xl p-8 h-[750px] flex flex-col">
+                    <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                        <h3 id="ride-title" class="font-black text-2xl text-blue-600">탑승 가능한 페트</h3>
+                        <button onclick="window.showDataModal('ride')" class="admin-only hidden bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-2xl font-black shadow-lg transition">+ 탑승 등록</button>
                     </div>
+                    <div id="ride-pet-gallery" class="flex-grow overflow-y-auto grid grid-cols-2 md:grid-cols-3 gap-6 content-start pr-2 custom-scrollbar"></div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- 데이터 통합 등록 모달 (페트, 아이템, 캐릭, 캘린더, 거래소) -->
-        <div id="data-modal" class="fixed inset-0 bg-black/60 hidden justify-center items-center z-[150] p-4 backdrop-blur-sm transition-opacity">
-            <div class="bg-white rounded-xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl overflow-hidden fade-in">
-                <div class="p-4 border-b flex justify-between items-center bg-gray-50">
-                    <h3 id="data-modal-title" class="text-lg font-bold text-gray-800">등록</h3>
-                    <button onclick="closeModal('data-modal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
-                </div>
-                <div id="data-modal-body" class="p-6 overflow-y-auto flex-grow custom-scrollbar"></div>
-                <div class="p-4 border-t bg-gray-50 flex justify-end gap-2">
-                    <button onclick="closeModal('data-modal')" class="px-4 py-2 rounded font-bold text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 transition">취소</button>
-                    <button onclick="saveData()" class="px-4 py-2 rounded font-bold text-white bg-blue-600 hover:bg-blue-700 shadow transition">저장</button>
-                </div>
+        <!-- Calendar Section -->
+        <section id="page-calendar" class="page-section hidden fade-in max-w-5xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-4xl font-black text-gray-800">캘린더</h2>
+                <button onclick="window.showDataModal('calendar')" class="admin-only hidden bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-black shadow-lg transition">+ 일정 등록</button>
             </div>
-        </div>
-
-        <!-- 커스텀 Confirm 모달 -->
-        <div id="confirm-modal" class="fixed inset-0 bg-black/60 hidden justify-center items-center z-[250] p-4 backdrop-blur-sm transition-opacity">
-            <div class="bg-white rounded-2xl w-full max-w-sm flex flex-col shadow-2xl overflow-hidden fade-in text-center p-6">
-                <div id="confirm-icon-wrap" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                    <i id="confirm-icon" class="fas fa-exclamation-triangle"></i>
-                </div>
-                <h3 id="confirm-title" class="text-xl font-black text-gray-800 mb-2">확인</h3>
-                <p id="confirm-msg" class="text-gray-500 text-sm mb-6">정말로 진행하시겠습니까?</p>
-                <div class="flex justify-center gap-3">
-                    <button onclick="closeModal('confirm-modal')" class="flex-1 px-4 py-2 rounded-lg font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition">취소</button>
-                    <button onclick="window.executeConfirm()" id="confirm-btn" class="flex-1 px-4 py-2 rounded-lg font-bold text-white shadow transition">확인</button>
-                </div>
+            <div class="bg-white border border-gray-100 rounded-[2rem] shadow-xl overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50/50 text-[10px] font-black text-gray-400 tracking-widest uppercase">
+                        <tr><th class="p-8">일정명</th><th class="p-8 text-center w-48">기간</th><th class="admin-only hidden p-8 text-center w-24">관리</th></tr>
+                    </thead>
+                    <tbody id="calendar-list" class="divide-y divide-gray-50"></tbody>
+                </table>
             </div>
-        </div>
-
+        </section>
     </main>
 
-    <footer class="bg-white border-t border-gray-200 py-6 mt-auto">
+    <!-- Modals (Data, Write, View, Confirm, Admin, Lightbox) -->
+    <div id="data-modal" class="fixed inset-0 bg-black/70 hidden justify-center items-center z-[110] p-4 backdrop-blur-md">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl overflow-hidden fade-in">
+            <div class="p-8 border-b flex justify-between items-center bg-gray-50/50">
+                <h3 id="data-modal-title" class="text-2xl font-black text-gray-800">등록</h3>
+                <button onclick="window.closeModal('data-modal')" class="text-gray-300 hover:text-gray-600 transition"><i class="fas fa-times text-2xl"></i></button>
+            </div>
+            <div id="data-modal-body" class="p-10 overflow-y-auto flex-grow custom-scrollbar"></div>
+            <div class="p-8 border-t bg-gray-50/50 flex justify-end gap-4">
+                <button onclick="window.closeModal('data-modal')" class="px-8 py-4 rounded-2xl font-black text-gray-500 bg-white border border-gray-200 hover:bg-gray-100 transition">취소</button>
+                <button onclick="window.saveData()" class="px-12 py-4 rounded-2xl font-black text-white bg-blue-600 hover:bg-blue-700 shadow-xl transition transform active:scale-95">저장하기</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="write-modal" class="fixed inset-0 bg-black/70 hidden justify-center items-center z-[110] p-4 backdrop-blur-md">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden fade-in">
+            <div class="p-8 border-b flex justify-between items-center bg-gray-50/50">
+                <h3 id="write-modal-title" class="text-2xl font-black text-gray-800">작성</h3>
+                <button onclick="window.closeModal('write-modal')" class="text-gray-300 hover:text-gray-600 transition"><i class="fas fa-times text-2xl"></i></button>
+            </div>
+            <div class="p-10 overflow-y-auto flex-grow bg-white">
+                <div class="mb-8">
+                    <label class="block text-xs font-black text-gray-400 mb-2 uppercase ml-1">제목</label>
+                    <input type="text" id="write-title" class="w-full px-8 py-5 border border-gray-100 rounded-3xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 text-xl font-black transition">
+                </div>
+                <div class="mb-2">
+                    <label class="block text-xs font-black text-gray-400 mb-2 uppercase ml-1">내용 (이미지 첨부 가능)</label>
+                    <div class="border border-gray-100 rounded-[2rem] overflow-hidden">
+                        <div class="bg-gray-50/50 p-4 border-b border-gray-50 flex flex-wrap gap-2 items-center">
+                            <button onclick="document.execCommand('bold')" class="w-12 h-12 hover:bg-gray-200 rounded-2xl text-gray-600"><i class="fas fa-bold"></i></button>
+                            <button onclick="document.execCommand('italic')" class="w-12 h-12 hover:bg-gray-200 rounded-2xl text-gray-600"><i class="fas fa-italic"></i></button>
+                            <div class="w-px h-6 bg-gray-200 mx-2"></div>
+                            <label class="cursor-pointer w-12 h-12 hover:bg-blue-100 rounded-2xl text-blue-600 flex items-center justify-center font-black">
+                                <i class="fas fa-image text-2xl"></i>
+                                <input type="file" class="hidden" accept="image/*" onchange="window.handleEditorImageUpload(event)">
+                            </label>
+                        </div>
+                        <div id="write-content" onmouseup="window.saveEditorSelection()" onkeyup="window.saveEditorSelection()" class="w-full h-[450px] p-8 focus:outline-none overflow-y-auto whitespace-pre-wrap leading-relaxed custom-scrollbar font-medium" contenteditable="true" placeholder="내용을 작성하세요."></div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-8 border-t bg-gray-50/50 flex justify-end gap-4">
+                <button onclick="window.closeModal('write-modal')" class="px-8 py-4 rounded-2xl font-black text-gray-500 bg-white border border-gray-200 hover:bg-gray-100 transition">취소</button>
+                <button onclick="window.saveBoardPost()" class="px-14 py-4 rounded-2xl font-black text-white bg-blue-600 hover:bg-blue-700 shadow-2xl transition transform active:scale-95">글 올리기</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-modal" class="fixed inset-0 bg-black/60 hidden justify-center items-center z-[100] p-4 backdrop-blur-md">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden fade-in">
+            <div class="p-8 border-b flex justify-between items-center bg-gray-50/50">
+                <div><h3 id="view-modal-title" class="text-3xl font-black text-gray-800 mb-1">제목</h3><p id="view-modal-date" class="text-sm font-black text-blue-600">날짜</p></div>
+                <button onclick="window.closeModal('view-modal')" class="text-gray-300 hover:text-gray-600 transition"><i class="fas fa-times text-2xl"></i></button>
+            </div>
+            <div id="view-modal-content" class="p-10 overflow-y-auto flex-grow text-gray-800 leading-relaxed whitespace-pre-wrap font-medium"></div>
+        </div>
+    </div>
+
+    <div id="confirm-modal" class="fixed inset-0 bg-black/60 hidden justify-center items-center z-[500] p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-sm p-10 text-center shadow-2xl fade-in">
+            <div id="confirm-icon-wrap" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl bg-yellow-50 text-yellow-500"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3 id="confirm-title" class="text-2xl font-black text-gray-800 mb-2">확인</h3>
+            <p id="confirm-msg" class="text-gray-400 font-bold mb-10 leading-relaxed"></p>
+            <div class="flex gap-4">
+                <button onclick="window.closeModal('confirm-modal')" class="flex-1 px-4 py-4 rounded-2xl font-black text-gray-500 bg-gray-100 hover:bg-gray-200 transition">아니오</button>
+                <button onclick="window.executeConfirm()" id="confirm-btn" class="flex-1 px-4 py-4 rounded-2xl font-black text-white shadow-xl transition transform active:scale-95">예</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-modal" class="fixed inset-0 bg-black/60 hidden justify-center items-center z-[200] p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-[2rem] w-full max-w-md shadow-2xl overflow-hidden fade-in">
+            <div class="p-8 border-b flex justify-between items-center bg-gray-50/50">
+                <h3 class="text-2xl font-black text-gray-800"><i class="fas fa-crown text-brand-gold mr-3"></i>게시판 관리</h3>
+                <button onclick="window.closeModal('admin-modal')" class="text-gray-300 hover:text-gray-600 transition"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-8">
+                <div class="mb-10 bg-blue-50/50 p-6 rounded-[1.5rem] border border-blue-100">
+                    <h4 class="font-black text-sm text-blue-800 mb-4 ml-1">새 게시판 추가</h4>
+                    <div class="space-y-3">
+                        <input type="text" id="new-cat-name" class="w-full px-5 py-3.5 border border-gray-100 rounded-2xl outline-none font-bold" placeholder="이름 (예: 퀘스트)">
+                        <input type="text" id="new-cat-id" class="w-full px-5 py-3.5 border border-gray-100 rounded-2xl outline-none font-bold" placeholder="영문 ID (예: quest)">
+                        <button onclick="window.addCategory()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black shadow-lg transition">추가하기</button>
+                    </div>
+                </div>
+                <div><h4 class="font-black text-sm text-gray-400 mb-4 ml-1 uppercase tracking-widest">현재 목록</h4><ul id="admin-cat-list" class="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar"></ul></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="lightbox" onclick="window.closeLightbox(event)"><img id="lightbox-img" src=""></div>
+
+    <footer class="bg-white border-t border-gray-50 py-10">
         <div class="container mx-auto px-4 text-center">
-            <p class="text-xs font-bold text-gray-400">© 2026 STONEAGE SKY. All rights reserved.</p>
-            <p class="text-[10px] text-gray-300 mt-1 cursor-pointer hover:text-gray-400 transition" onclick="showAdminPrompt()">[관리자]</p>
+            <p class="text-[10px] font-black text-gray-300 tracking-widest uppercase">© 2026 STONEAGE SKY. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Lightbox -->
-    <div id="lightbox" onclick="closeLightbox(event)">
-        <span class="close-btn" onclick="closeLightbox(event)">&times;</span>
-        <img id="lightbox-img" src="" alt="Expanded Image">
-    </div>
+    <!-- 모든 처리 함수를 최상단에 미리 정의 (TypeError 방지) -->
+    <script>
+        window.allPets = []; window.allCharacters = []; window.allRidePets = []; window.allItems = []; window.allExchanges = []; window.allCategories = [];
+        window.currentBoard = ''; window.editingId = null; window.tempImageData = {}; window.unsubs = {}; window.currentExchangeTab = '구매';
+        window.isAdmin = false; window.savedEditorRange = null; window.selectedCharIdForRide = null;
 
-    <!-- Firebase SDK -->
+        window.showToast = function(msg, isError = false) {
+            const t = document.createElement('div');
+            t.className = `fixed bottom-10 left-1/2 -translate-x-1/2 px-10 py-5 rounded-full shadow-2xl font-black z-[12000] fade-in text-white ${isError ? 'bg-red-600' : 'bg-gray-800'}`;
+            t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2500);
+        };
+        window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); };
+        window.openLightbox = function(src) { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'flex'; };
+        window.closeLightbox = function(e) { if(e.target.id !== 'lightbox-img') document.getElementById('lightbox').style.display = 'none'; };
+
+        window.updateAdminUI = function() {
+            document.querySelectorAll('.admin-only').forEach(el => window.isAdmin ? el.classList.remove('hidden') : el.classList.add('hidden'));
+            const adminBtn = document.getElementById('admin-setting-btn');
+            if(adminBtn && window.isAdmin) adminBtn.classList.remove('hidden');
+        };
+
+        window.filterPets = function() {
+            const term = document.getElementById('pet-search')?.value.toLowerCase() || '';
+            const gal = document.getElementById('pet-gallery'); if(!gal) return;
+            gal.innerHTML = window.allPets.filter(p => p.name.toLowerCase().includes(term)).map(p => `
+                <div class="bg-gray-900 rounded-[2rem] overflow-hidden shadow-2xl text-white relative group border border-gray-800 flex flex-col h-full">
+                    <div class="admin-only ${window.isAdmin?'':'hidden'} absolute top-4 right-4 z-10 flex gap-2">
+                        <button onclick="window.showDataModal('pet', '${p.id}')" class="bg-black/50 hover:bg-blue-600 p-2.5 rounded-xl text-white transition"><i class="fas fa-edit text-xs"></i></button>
+                        <button onclick="window.deleteData('pet', '${p.id}')" class="bg-black/50 hover:bg-red-600 p-2.5 rounded-xl text-white transition"><i class="fas fa-trash text-xs"></i></button>
+                    </div>
+                    <div class="h-48 bg-gray-800/50 flex justify-center items-center p-6"><img src="${p.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition duration-500" onclick="window.openLightbox(this.src)"></div>
+                    <div class="p-6 flex-grow flex flex-col">
+                        <h4 class="font-black text-xl mb-3 text-center truncate">${p.name}</h4>
+                        <div class="space-y-2 mb-5">
+                            <div class="flex items-center"><span class="w-7 text-[10px] font-black text-blue-400">水</span>${drawAttrBar(p.attr_w,'bg-blue-500')}</div>
+                            <div class="flex items-center"><span class="w-7 text-[10px] font-black text-yellow-600">地</span>${drawAttrBar(p.attr_e,'bg-yellow-600')}</div>
+                            <div class="flex items-center"><span class="w-7 text-[10px] font-black text-red-500">火</span>${drawAttrBar(p.attr_f,'bg-red-500')}</div>
+                            <div class="flex items-center"><span class="w-7 text-[10px] font-black text-green-500">風</span>${drawAttrBar(p.attr_wi,'bg-green-500')}</div>
+                        </div>
+                        <div class="mt-auto flex justify-between items-center border border-gray-700 rounded-2xl bg-gray-800/80 p-4">
+                            <span class="text-[10px] text-gray-500 font-black uppercase tracking-widest">Growth</span>
+                            <span class="font-black text-brand-gold text-xl tracking-tighter">${p.total||'-'}</span>
+                        </div>
+                    </div>
+                </div>`).join('');
+            window.updateAdminUI();
+        };
+
+        const drawAttrBar = (val, color) => {
+            let b = ''; for(let i=0; i<10; i++) b += `<div class="w-full h-1.5 rounded-sm ${i < val ? color : 'bg-gray-800'}"></div>`;
+            return `<div class="flex gap-[2px] w-full px-1">${b}</div>`;
+        };
+    </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -405,797 +415,360 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Global Variables
-        window.auth = auth;
-        window.db = db;
-        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-        window.signOut = signOut;
-        window.collection = collection;
-        window.addDoc = addDoc;
-        window.setDoc = setDoc;
-        window.doc = doc;
-        window.getDoc = getDoc;
-        window.updateDoc = updateDoc;
-        window.deleteDoc = deleteDoc;
-        window.query = query;
-        window.orderBy = orderBy;
-        window.onSnapshot = onSnapshot;
+        // Bind for Global Access
+        window.auth = auth; window.db = db;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword; window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signOut = signOut; window.collection = collection; window.addDoc = addDoc; window.setDoc = setDoc;
+        window.doc = doc; window.getDoc = getDoc; window.updateDoc = updateDoc; window.deleteDoc = deleteDoc;
+        window.query = query; window.orderBy = orderBy; window.onSnapshot = onSnapshot;
 
-        window.authMode = 'login';
-        window.currentUser = null;
-        window.isAdmin = false;
-        window.currentBoard = '';
-        window.editingId = null;
-        window.tempImageData = {};
-        
-        // Data Arrays
-        window.allPets = [];
-        window.allCharacters = [];
-        window.allRidePets = [];
-        window.allItems = [];
-        window.allExchanges = [];
-        window.allCategories = []; // 동적 카테고리
-        window.currentExchangeTab = '구매';
-        window.selectedCharIdForRide = null;
+        // 안정적인 초기 로딩 로직
+        let loginChecked = false;
+        const hideLoader = () => {
+            const loader = document.getElementById('initial-loader');
+            if(loader) loader.classList.add('hidden');
+        };
 
-        // Unsubscribe functions
-        window.unsubs = {};
+        // 5초 후에도 로딩이 안 풀리면 강제 해제 (비상구)
+        setTimeout(hideLoader, 5000);
 
-        const defaultChars = ["석기미남", "꼬맹이(남)", "꼬맹이(여)", "어리버리맨", "불량소년", "곰아저씨", "인디언돌쇠", "물개소녀", "내숭소녀", "귀염둥이", "터프소녀", "몸짱아줌마", "정글소녀", "울보소녀", "바람소년", "툰가", "산적"];
-
-        // Auth Listener
         onAuthStateChanged(auth, (user) => {
+            loginChecked = true;
+            const overlay = document.getElementById('auth-overlay');
+            const userArea = document.getElementById('user-info-area');
+            const userInfo = document.getElementById('user-info');
+
             if (user) {
                 window.currentUser = user;
                 window.isAdmin = (user.email === 'milk@stoneage.sky');
+                if(overlay) overlay.classList.add('hidden');
+                if(userArea) userArea.classList.remove('hidden');
+                if(userInfo) userInfo.innerHTML = window.isAdmin ? '👑 관리자' : (user.email.split('@')[0] + ' 님');
                 
-                document.getElementById('auth-overlay').classList.add('hidden');
-                document.getElementById('user-info').textContent = user.email.split('@')[0] + ' 님';
-                document.getElementById('user-info').classList.remove('hidden');
-                document.getElementById('logout-btn').classList.remove('hidden');
-                
-                if(window.isAdmin) {
-                    document.getElementById('admin-setting-btn').classList.remove('hidden');
-                    document.getElementById('user-info').classList.add('bg-blue-100', 'text-blue-700');
-                    document.getElementById('user-info').innerHTML = '👑 관리자';
-                }
-
-                updateAdminUI();
+                // 순서 보장: 유저 확인 후 리스너 시작
                 initRealtimeListeners();
-                showPage('home');
+                window.showPage('home');
             } else {
-                window.currentUser = null;
-                window.isAdmin = false;
-                document.getElementById('auth-overlay').classList.remove('hidden');
-                document.getElementById('user-info').classList.add('hidden');
-                document.getElementById('logout-btn').classList.add('hidden');
-                document.getElementById('admin-setting-btn').classList.add('hidden');
-                
-                // Clear listeners
-                Object.values(window.unsubs).forEach(unsub => { if(typeof unsub === 'function') unsub(); });
-                window.unsubs = {};
+                window.currentUser = null; window.isAdmin = false;
+                if(overlay) overlay.classList.remove('hidden');
+                if(userArea) userArea.classList.add('hidden');
             }
+            hideLoader();
         });
-    </script>
-
-    <!-- UI & Logic Functions -->
-    <script>
-        // --- Utilities ---
-        function showToast(msg, isError = false) {
-            const toast = document.createElement('div');
-            toast.className = `fixed bottom-5 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl font-bold z-[9999] fade-in text-white ${isError ? 'bg-red-600' : 'bg-gray-800'}`;
-            toast.textContent = msg;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2500);
-        }
-
-        window.showCustomConfirm = function(title, msg, isDanger, callback) {
-            document.getElementById('confirm-title').textContent = title;
-            document.getElementById('confirm-msg').innerHTML = msg;
-            const btn = document.getElementById('confirm-btn');
-            const iconWrap = document.getElementById('confirm-icon-wrap');
-            const icon = document.getElementById('confirm-icon');
-            
-            if (isDanger) {
-                btn.textContent = '삭제';
-                btn.className = 'flex-1 px-4 py-2 rounded-lg font-bold text-white bg-red-600 hover:bg-red-700 shadow transition';
-                iconWrap.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-red-100 text-red-500';
-                icon.className = 'fas fa-trash-alt';
-            } else {
-                btn.textContent = '확인';
-                btn.className = 'flex-1 px-4 py-2 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-700 shadow transition';
-                iconWrap.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-blue-100 text-blue-500';
-                icon.className = 'fas fa-sign-out-alt';
-            }
-            window.confirmCallback = callback;
-            document.getElementById('confirm-modal').classList.remove('hidden');
-        };
-
-        window.executeConfirm = function() {
-            closeModal('confirm-modal');
-            if(window.confirmCallback) window.confirmCallback();
-        };
-
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        
-        function openLightbox(src) {
-            document.getElementById('lightbox-img').src = src;
-            document.getElementById('lightbox').style.display = 'flex';
-        }
-        function closeLightbox(e) {
-            if(e.target.id !== 'lightbox-img') document.getElementById('lightbox').style.display = 'none';
-        }
-
-        // --- Image Handling ---
-        // 에디터 커서 위치 기억용 변수
-        window.savedEditorRange = null;
-
-        // 현재 에디터의 커서 위치 저장 함수
-        window.saveEditorSelection = function() {
-            const sel = window.getSelection();
-            if (sel.getRangeAt && sel.rangeCount) {
-                const range = sel.getRangeAt(0);
-                const editor = document.getElementById('write-content');
-                if (editor.contains(range.commonAncestorContainer)) {
-                    window.savedEditorRange = range;
-                }
-            }
-        };
-
-        // 리치 텍스트 에디터용 이미지 압축 및 중간 삽입
-        async function handleEditorImageUpload(event) {
-            const file = event.target.files[0];
-            if(!file) return;
-            try {
-                const base64Str = await compressImage(file, 800, 0.8);
-                const editor = document.getElementById('write-content');
-                
-                // 에디터 포커스 및 저장된 커서 위치 복구
-                editor.focus();
-                if (window.savedEditorRange) {
-                    const sel = window.getSelection();
-                    sel.removeAllRanges();
-                    sel.addRange(window.savedEditorRange);
-                }
-                
-                // 이미지 태그를 현재 커서 위치에 삽입
-                const imgHtml = `<img src="${base64Str}" class="max-w-full rounded shadow-sm my-2" />`;
-                const success = document.execCommand('insertHTML', false, imgHtml);
-                
-                // 만약 브라우저 보안 등으로 execCommand가 실패하면 에디터 맨 끝에 추가
-                if (!success) {
-                    editor.innerHTML += imgHtml;
-                }
-            } catch(e) { showToast("이미지 처리에 실패했습니다.", true); }
-            event.target.value = '';
-        }
-
-        // 폼/모달용 썸네일 이미지 압축 (UI에 미리보기 표시)
-        async function handleFormImageUpload(event, previewId) {
-            const file = event.target.files[0];
-            if(!file) return;
-            try {
-                const base64Str = await compressImage(file, 800, 0.8);
-                const pv = document.getElementById(previewId);
-                pv.src = base64Str;
-                pv.classList.remove('hidden');
-                window.tempImageData['image'] = base64Str;
-            } catch(e) { showToast("이미지 처리에 실패했습니다.", true); }
-        }
-
-        function compressImage(file, maxWidth, quality) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let w = img.width, h = img.height;
-                        if(w > maxWidth) { h *= maxWidth/w; w = maxWidth; }
-                        canvas.width = w; canvas.height = h;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, w, h);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                    img.onerror = reject;
-                    img.src = e.target.result;
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // --- Auth ---
-        function toggleAuthMode() {
-            window.authMode = window.authMode === 'login' ? 'signup' : 'login';
-            document.getElementById('auth-title').textContent = window.authMode === 'login' ? '로그인' : '회원가입';
-            document.getElementById('auth-btn').textContent = window.authMode === 'login' ? '입장하기' : '가입하기';
-            document.getElementById('auth-toggle').textContent = window.authMode === 'login' ? '계정이 없으신가요? 회원가입' : '이미 계정이 있으신가요? 로그인';
-        }
-
-        async function handleAuthSubmit() {
-            const id = document.getElementById('auth-id').value.trim();
-            const pw = document.getElementById('auth-pw').value;
-            if(!id || !pw) return showToast('아이디와 비밀번호를 입력해주세요.', true);
-            const email = id === 'milk' ? 'milk@stoneage.sky' : `${id}@stoneage.sky`;
-
-            try {
-                if(window.authMode === 'login') {
-                    await window.signInWithEmailAndPassword(window.auth, email, pw);
-                } else {
-                    if(id === 'milk') return showToast('해당 아이디는 생성할 수 없습니다.', true);
-                    await window.createUserWithEmailAndPassword(window.auth, email, pw);
-                    showToast('회원가입 완료!');
-                }
-            } catch(e) {
-                showToast("아이디나 비밀번호가 틀렸습니다.", true);
-            }
-        }
-
-        window.handleLogout = function() {
-            window.showCustomConfirm('로그아웃', '접속을 종료하시겠습니까?', false, async () => {
-                await window.signOut(window.auth);
-                window.location.reload();
-            });
-        }
-
-        function showAdminPrompt() {
-            if(window.isAdmin) return;
-            const pw = prompt("관리자 비밀번호를 입력하세요.");
-            if(pw === '19191919') {
-                window.signInWithEmailAndPassword(window.auth, 'milk@stoneage.sky', pw).catch(()=>showToast('에러발생',true));
-            } else if (pw) {
-                showToast('비밀번호가 틀렸습니다.', true);
-            }
-        }
-
-        function updateAdminUI() {
-            document.querySelectorAll('.admin-only').forEach(el => window.isAdmin ? el.classList.remove('hidden') : el.classList.add('hidden'));
-            if(window.allExchanges.length > 0) window.switchExchangeTab(window.currentExchangeTab);
-        }
-
-        // --- Page Logic ---
-        function showPage(pageId) {
-            document.querySelectorAll('.page-section').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-blue-50', 'text-blue-600'));
-            
-            // 정적 카테고리 매핑
-            const isBoard = ['notice', 'patch'].includes(pageId) || window.allCategories.some(c=>c.id===pageId);
-            
-            if(isBoard) {
-                window.currentBoard = pageId;
-                let title = '게시판';
-                if(pageId === 'notice') title = '공지사항';
-                else if(pageId === 'patch') title = '패치노트';
-                else {
-                    const cat = window.allCategories.find(c=>c.id===pageId);
-                    if(cat) title = cat.name;
-                }
-                document.getElementById('board-title').textContent = title;
-                document.getElementById('page-board').classList.remove('hidden');
-                renderBoard();
-            } else {
-                document.getElementById(`page-${pageId}`)?.classList.remove('hidden');
-            }
-
-            const activeBtn = document.querySelector(`.nav-btn[data-target="${pageId}"]`);
-            if(activeBtn) activeBtn.classList.add('bg-blue-50', 'text-blue-600');
-        }
-
-        // --- Realtime DB Setup ---
-        function safeListen(colName, orderByField, callback) {
-            try {
-                let q = window.collection(window.db, colName);
-                if(orderByField) q = window.query(q, window.orderBy(orderByField, "desc"));
-                window.unsubs[colName] = window.onSnapshot(q, snap => {
-                    const data = [];
-                    snap.forEach(d => data.push({id: d.id, ...d.data()}));
-                    callback(data);
-                }, err => {
-                    console.error(`${colName} 권한 에러`);
-                });
-            } catch(e) {}
-        }
 
         function initRealtimeListeners() {
-            // Categories
-            safeListen("categories", "createdAt", (data) => {
-                window.allCategories = data.reverse(); // 오래된순
-                renderDynamicMenus();
-                if(document.getElementById('admin-modal').classList.contains('hidden') === false) renderAdminCategories();
-            });
-            // Boards
-            safeListen("notice", "createdAt", (data) => { window.noticeData = data; if(window.currentBoard==='notice') renderBoard(); renderHomeRecent(); });
-            safeListen("patch", "createdAt", (data) => { window.patchData = data; if(window.currentBoard==='patch') renderBoard(); renderHomeRecent(); });
-            safeListen("calendar", "startDate", (data) => { window.allCalendars = data; renderCalendar(); renderHomeRecent(); });
-            // Gallery
-            safeListen("pet", "createdAt", (data) => { window.allPets = data; window.filterPets(); });
-            safeListen("items", "createdAt", (data) => { window.allItems = data; window.filterItems(); });
-            
-            // 거래소 (2주 지난 물품 자동 삭제 로직 추가)
-            safeListen("exchange", "createdAt", (data) => { 
-                const TWO_WEEKS_MS = 14 * 24 * 60 * 60 * 1000; // 14일을 밀리초(ms)로 계산
+            const safeListen = (col, order, cb) => {
+                if (window.unsubs[col]) return;
+                try {
+                    const q = window.query(window.collection(window.db, col), window.orderBy(order, "desc"));
+                    window.unsubs[col] = window.onSnapshot(q, snap => {
+                        const list = []; snap.forEach(d => list.push({id: d.id, ...d.data()}));
+                        cb(list);
+                    }, err => console.log(col + " 권한 없음"));
+                } catch(e) { console.log(e); }
+            };
+
+            safeListen("notice", "createdAt", data => { window.noticeData = data; if(window.currentBoard==='notice') window.renderBoard(); window.renderHome(); });
+            safeListen("patch", "createdAt", data => { window.patchData = data; if(window.currentBoard==='patch') window.renderBoard(); window.renderHome(); });
+            safeListen("calendar", "startDate", data => { window.allCalendars = data; window.renderCalendar(); window.renderHome(); });
+            safeListen("pet", "createdAt", data => { window.allPets = data; window.filterPets(); });
+            safeListen("character", "name", data => { window.allCharacters = data; window.filterCharacters(); });
+            safeListen("ride", "createdAt", data => { window.allRidePets = data; window.filterRidePets(); });
+            safeListen("items", "createdAt", data => { window.allItems = data; window.filterItems(); });
+            safeListen("exchange", "createdAt", data => {
                 const now = Date.now();
-
-                // 2주가 지난 게시물 필터링 및 파이어베이스에서 자동 삭제
-                window.allExchanges = data.filter(item => {
-                    if (item.createdAt && (now - item.createdAt > TWO_WEEKS_MS)) {
-                        // 조건에 맞으면 파이어베이스 DB에서 즉시 삭제
-                        window.deleteDoc(window.doc(window.db, "exchange", item.id)).catch(()=>{});
-                        return false; // 화면 목록에서도 보이지 않게 제외
-                    }
-                    return true; // 2주가 안 지난 물품만 남김
+                window.allExchanges = data.filter(e => {
+                    if (now - e.createdAt > 14 * 24 * 60 * 60 * 1000) { window.deleteDoc(window.doc(window.db, "exchange", e.id)).catch(()=>{}); return false; }
+                    return true;
                 });
-
-                window.switchExchangeTab(window.currentExchangeTab); 
+                window.switchExchangeTab(window.currentExchangeTab);
             });
-
-            // Ride & Chars
-            safeListen("character", "name", (data) => { 
-                window.allCharacters = data; 
-                if(window.isAdmin && data.length===0) {
-                    defaultChars.forEach(name => window.addDoc(window.collection(window.db, "character"), {name}));
-                }
-                window.filterCharacters(); 
+            safeListen("categories", "createdAt", data => {
+                window.allCategories = data;
+                const container = document.getElementById('dynamic-nav-container');
+                if(container) container.innerHTML = data.map(c => `<a href="#" onclick="window.showPage('${c.id}')" class="nav-btn px-4 py-2 rounded-xl hover:bg-gray-100 transition" data-target="${c.id}">${c.name}</a>`).join('');
+                data.forEach(c => {
+                    if(!window.unsubs[c.id]) safeListen(c.id, "createdAt", d => { window['data_'+c.id] = d; if(window.currentBoard===c.id) window.renderBoard(); });
+                });
             });
-            safeListen("ride", "name", (data) => { window.allRidePets = data; window.filterRidePets(); });
         }
+    </script>
 
-        // --- Categories (Admin) ---
-        function showAdminSettings() {
-            renderAdminCategories();
-            document.getElementById('admin-modal').classList.remove('hidden');
-        }
+    <!-- Page Logic Script (Global window functions) -->
+    <script>
+        window.toggleAuthMode = function() {
+            window.authMode = (window.authMode === 'login' ? 'signup' : 'login');
+            document.getElementById('auth-title').textContent = (window.authMode === 'login' ? '로그인' : '회원가입');
+            document.getElementById('auth-btn').textContent = (window.authMode === 'login' ? '입장하기' : '가입하기');
+        };
 
-        function renderAdminCategories() {
-            const ul = document.getElementById('admin-cat-list');
-            ul.innerHTML = window.allCategories.map(cat => `
-                <li class="flex justify-between items-center bg-white p-2 rounded border border-gray-200">
-                    <span class="text-sm font-bold text-gray-700">${cat.name} <span class="text-xs font-normal text-gray-400">(${cat.id})</span></span>
-                    <button onclick="deleteCategory('${cat.id}')" class="text-red-500 hover:text-red-700 p-1"><i class="fas fa-trash"></i></button>
-                </li>
-            `).join('') || `<li class="text-xs text-gray-400 text-center">추가된 게시판이 없습니다.</li>`;
-        }
-
-        async function addCategory() {
-            const name = document.getElementById('new-cat-name').value.trim();
-            const id = document.getElementById('new-cat-id').value.trim();
-            if(!name || !id) return showToast('이름과 영문ID를 모두 입력하세요.', true);
-            if(!/^[a-z0-9]+$/.test(id)) return showToast('ID는 영소문자와 숫자만 가능합니다.', true);
-            if(['notice','patch','calendar','pet','ride','item','exchange','home'].includes(id) || window.allCategories.find(c=>c.id===id)) return showToast('사용할 수 없는 ID입니다.', true);
-            
+        window.handleAuthSubmit = async function() {
+            const id = document.getElementById('auth-id').value.trim();
+            const pw = document.getElementById('auth-pw').value;
+            if(!id || !pw) return window.showToast('아이디와 비밀번호를 입력하세요.', true);
+            const email = (id === 'milk' ? 'milk@stoneage.sky' : `${id}@stoneage.sky`);
             try {
-                await window.setDoc(window.doc(window.collection(window.db, "categories"), id), { id, name, createdAt: Date.now() });
-                document.getElementById('new-cat-name').value = '';
-                document.getElementById('new-cat-id').value = '';
-                showToast('게시판이 추가되었습니다.');
-            } catch(e) { showToast('오류가 발생했습니다.', true); }
-        }
-
-        window.deleteCategory = function(id) {
-            window.showCustomConfirm('게시판 삭제', '해당 메뉴를 삭제하시겠습니까?', true, async () => {
-                await window.deleteDoc(window.doc(window.db, "categories", id));
-                showToast('삭제되었습니다.');
-            });
-        }
-
-        function renderDynamicMenus() {
-            const nav = document.getElementById('dynamic-nav');
-            nav.innerHTML = window.allCategories.map(cat => `
-                <a href="#" onclick="showPage('${cat.id}')" class="nav-btn px-4 py-2 rounded-lg hover:bg-gray-100 transition" data-target="${cat.id}">${cat.name}</a>
-            `).join('');
-            
-            // 동적 게시판 리스너 연결
-            window.allCategories.forEach(cat => {
-                if(!window.unsubs[cat.id]) {
-                    safeListen(cat.id, "createdAt", (data) => {
-                        window[`data_${cat.id}`] = data;
-                        if(window.currentBoard === cat.id) renderBoard();
-                    });
+                if(window.authMode === 'signup') {
+                    if(id === 'milk') return window.showToast('금지된 아이디입니다.', true);
+                    await window.createUserWithEmailAndPassword(window.auth, email, pw);
+                } else {
+                    await window.signInWithEmailAndPassword(window.auth, email, pw);
                 }
+            } catch(e) { window.showToast('정보를 확인해주세요.', true); }
+        };
+
+        window.handleLogout = function() {
+            window.showCustomConfirm('로그아웃', '정말 접속을 종료하시겠습니까?', false, async () => {
+                await window.signOut(window.auth); window.location.reload();
             });
-        }
+        };
 
-        // --- Boards ---
-        function renderBoard() {
-            const tbody = document.getElementById('board-list');
-            let data = [];
-            if(window.currentBoard === 'notice') data = window.noticeData || [];
-            else if(window.currentBoard === 'patch') data = window.patchData || [];
-            else data = window[`data_${window.currentBoard}`] || [];
+        window.showPage = function(pId) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('bg-blue-50', 'text-blue-600', 'ring-1', 'ring-blue-100'));
+            
+            const isDyn = window.allCategories.find(c => c.id === pId);
+            if(['notice', 'patch'].includes(pId) || isDyn) {
+                window.currentBoard = pId;
+                document.getElementById('board-title').textContent = (pId==='notice'?'공지사항':(pId==='patch'?'패치노트':isDyn.name));
+                document.getElementById('page-board').classList.remove('hidden');
+                window.renderBoard();
+            } else {
+                document.getElementById('page-' + pId)?.classList.remove('hidden');
+            }
+            document.querySelector(`.nav-btn[data-target="${pId}"]`)?.classList.add('bg-blue-50', 'text-blue-600', 'ring-1', 'ring-blue-100');
+            window.updateAdminUI();
+        };
 
-            tbody.innerHTML = data.map(item => `
-                <tr class="hover:bg-gray-50 transition cursor-pointer" onclick="viewBoardPost('${window.currentBoard}', '${item.id}')">
-                    <td class="p-4 font-bold text-gray-800">${item.title}</td>
-                    <td class="p-4 text-center text-sm text-gray-500">${new Date(item.createdAt).toLocaleDateString()}</td>
-                    <td class="admin-only ${window.isAdmin?'':'hidden'} p-4 text-center" onclick="event.stopPropagation()">
-                        <button onclick="showWriteModal('${item.id}')" class="text-gray-400 hover:text-blue-500 p-1"><i class="fas fa-pen"></i></button>
-                        <button onclick="deleteData('${window.currentBoard}', '${item.id}')" class="text-gray-400 hover:text-red-500 p-1"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('') || `<tr><td colspan="3" class="text-center p-8 text-gray-500">등록된 글이 없습니다.</td></tr>`;
-        }
-
-        function renderCalendar() {
-            const tbody = document.getElementById('calendar-list');
-            if(!tbody) return;
-            tbody.innerHTML = (window.allCalendars||[]).map(item => `
-                <tr class="hover:bg-gray-50 transition cursor-pointer" onclick="viewBoardPost('calendar', '${item.id}')">
-                    <td class="p-4 font-bold text-gray-800">${item.title}</td>
-                    <td class="p-4 text-center text-sm text-gray-500 font-bold">${item.startDate} ~ ${item.endDate}</td>
-                    <td class="admin-only ${window.isAdmin?'':'hidden'} p-4 text-center" onclick="event.stopPropagation()">
-                        <button onclick="showDataModal('calendar', '${item.id}')" class="text-gray-400 hover:text-blue-500 p-1"><i class="fas fa-pen"></i></button>
-                        <button onclick="deleteData('calendar', '${item.id}')" class="text-gray-400 hover:text-red-500 p-1"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('') || `<tr><td colspan="3" class="text-center p-8 text-gray-500">등록된 일정이 없습니다.</td></tr>`;
-        }
-
-        function renderHomeRecent() {
-            const draw = (id, data, targetCol) => {
-                const ul = document.getElementById(id);
-                if(!ul) return;
-                ul.innerHTML = (data||[]).slice(0, 5).map(item => `
-                    <li class="flex justify-between items-center cursor-pointer hover:text-blue-600 transition" onclick="viewBoardPost('${targetCol}', '${item.id}')">
-                        <span class="truncate pr-4 font-medium">${item.title}</span>
-                        <span class="text-xs text-gray-400 whitespace-nowrap">${new Date(item.createdAt).toLocaleDateString()}</span>
-                    </li>
-                `).join('') || `<li class="text-gray-400 text-center py-2">게시물이 없습니다.</li>`;
+        window.renderHome = function() {
+            const draw = (id, data, col) => {
+                const el = document.getElementById(id); if(!el) return;
+                el.innerHTML = (data||[]).slice(0, 5).map(item => `
+                    <li onclick="window.viewBoardPost('${col}','${item.id}')" class="flex justify-between items-center p-1 cursor-pointer hover:translate-x-1 transition group">
+                        <span class="truncate font-bold text-gray-700 group-hover:text-blue-600 transition">${item.title}</span>
+                        <span class="text-[10px] font-black text-gray-300">${new Date(item.createdAt).toLocaleDateString()}</span>
+                    </li>`).join('') || '<li class="text-xs text-gray-300 text-center py-4">최근 소식이 없습니다.</li>';
             };
             draw('home-notice-list', window.noticeData, 'notice');
             draw('home-patch-list', window.patchData, 'patch');
+            const cal = document.getElementById('home-calendar-list');
+            if(cal) cal.innerHTML = (window.allCalendars||[]).slice(0, 5).map(item => `
+                <li onclick="window.viewBoardPost('calendar','${item.id}')" class="bg-purple-50/50 p-3 rounded-2xl text-purple-800 cursor-pointer hover:bg-purple-100 transition">
+                    <p class="font-black text-xs truncate">${item.title}</p>
+                    <p class="text-[10px] font-bold opacity-60">${item.startDate.substring(5)} ~ ${item.endDate.substring(5)}</p>
+                </li>`).join('') || '<li class="text-xs text-gray-300 text-center py-4">예정된 일정이 없습니다.</li>';
+        };
 
-            const calUl = document.getElementById('home-calendar-list');
-            if(calUl) {
-                calUl.innerHTML = (window.allCalendars||[]).slice(0, 5).map(item => `
-                    <li class="flex justify-between items-center p-2 bg-purple-50 rounded text-purple-800 cursor-pointer hover:bg-purple-100 transition" onclick="viewBoardPost('calendar', '${item.id}')">
-                        <span class="truncate pr-4 font-bold text-sm">${item.title}</span>
-                        <span class="whitespace-nowrap font-bold text-xs">${item.startDate.substring(5).replace('-','.')} ~ ${item.endDate.substring(5).replace('-','.')}</span>
-                    </li>`).join('') || `<li class="text-gray-400 text-center py-2">예정된 일정이 없습니다.</li>`;
-            }
-        }
-
-        // --- Modals & Data Fetch ---
-        window.viewBoardPost = async function(col, id) {
-            try {
-                const docSnap = await window.getDoc(window.doc(window.db, col, id));
-                if(docSnap.exists()) {
-                    const data = docSnap.data();
-                    document.getElementById('view-modal-title').textContent = data.title;
-                    if(col === 'calendar') document.getElementById('view-modal-date').textContent = `${data.startDate} ~ ${data.endDate}`;
-                    else document.getElementById('view-modal-date').textContent = new Date(data.createdAt).toLocaleDateString();
-                    document.getElementById('view-modal-content').innerHTML = data.content || '내용 없음';
-                    
-                    // 라이트박스 연결
-                    document.getElementById('view-modal-content').querySelectorAll('img').forEach(img => {
-                        img.classList.add('cursor-pointer', 'rounded', 'shadow-sm', 'my-2');
-                        img.onclick = () => openLightbox(img.src);
-                    });
-
-                    document.getElementById('view-modal').classList.remove('hidden');
-                }
-            } catch(e) {}
-        }
-
-        window.showWriteModal = async function(editId = null) {
-            window.editingId = editId;
-            const titleEl = document.getElementById('write-title');
-            const contentEl = document.getElementById('write-content');
+        window.renderBoard = function() {
+            const tbody = document.getElementById('board-list'); if(!tbody) return;
+            let d = [];
+            if(window.currentBoard === 'notice') d = window.noticeData;
+            else if(window.currentBoard === 'patch') d = window.patchData;
+            else d = window['data_' + window.currentBoard] || [];
             
-            let titleText = '등록';
-            if(window.currentBoard==='notice') titleText = '공지사항';
-            else if(window.currentBoard==='patch') titleText = '패치노트';
-            else titleText = window.allCategories.find(c=>c.id===window.currentBoard)?.name || '게시판';
-            
-            document.getElementById('write-modal-title').textContent = `${titleText} ${editId?'수정':'작성'}`;
-            titleEl.value = '';
-            contentEl.innerHTML = '';
+            tbody.innerHTML = (d||[]).map(item => `
+                <tr onclick="window.viewBoardPost('${window.currentBoard}', '${item.id}')" class="hover:bg-gray-50 transition cursor-pointer">
+                    <td class="p-8 font-black text-gray-800">${item.title}</td>
+                    <td class="p-8 text-center text-[10px] font-black text-gray-400">${new Date(item.createdAt).toLocaleDateString()}</td>
+                    <td class="admin-only ${window.isAdmin?'':'hidden'} p-8 text-center" onclick="event.stopPropagation()">
+                        <button onclick="window.showWriteModal('${item.id}')" class="text-gray-300 hover:text-blue-600 p-2"><i class="fas fa-edit"></i></button>
+                        <button onclick="window.deleteData('${window.currentBoard}', '${item.id}')" class="text-gray-300 hover:text-red-600 p-2"><i class="fas fa-trash"></i></button>
+                    </td></tr>`).join('') || '<tr><td colspan="3" class="p-20 text-center text-gray-300 font-black">등록된 글이 없습니다.</td></tr>';
+            window.updateAdminUI();
+        };
 
-            if(editId) {
-                const docSnap = await window.getDoc(window.doc(window.db, window.currentBoard, editId));
-                if(docSnap.exists()) {
-                    titleEl.value = docSnap.data().title;
-                    contentEl.innerHTML = docSnap.data().content;
-                }
-            }
-            document.getElementById('write-modal').classList.remove('hidden');
+        window.renderCalendar = function() {
+            const tbody = document.getElementById('calendar-list'); if(!tbody) return;
+            tbody.innerHTML = (window.allCalendars||[]).map(item => `
+                <tr onclick="window.viewBoardPost('calendar', '${item.id}')" class="hover:bg-gray-50 transition cursor-pointer">
+                    <td class="p-8 font-black text-gray-800">${item.title}</td>
+                    <td class="p-8 text-center text-sm font-black text-gray-400">${item.startDate} ~ ${item.endDate}</td>
+                    <td class="admin-only ${window.isAdmin?'':'hidden'} p-8 text-center" onclick="event.stopPropagation()">
+                        <button onclick="window.showDataModal('calendar', '${item.id}')" class="text-gray-300 hover:text-blue-600 p-2"><i class="fas fa-edit"></i></button>
+                        <button onclick="window.deleteData('calendar', '${item.id}')" class="text-gray-300 hover:text-red-600 p-2"><i class="fas fa-trash"></i></button>
+                    </td></tr>`).join('') || '<tr><td colspan="3" class="p-20 text-center text-gray-300 font-black">일정이 없습니다.</td></tr>';
+            window.updateAdminUI();
+        };
+
+        window.saveEditorSelection = function() {
+            const s = window.getSelection(); if (s.rangeCount > 0) window.savedEditorRange = s.getRangeAt(0);
+        };
+
+        window.handleEditorImageUpload = async function(e) {
+            const f = e.target.files[0]; if(!f) return;
+            const b64 = await compressImg(f, 800, 0.8);
+            const ed = document.getElementById('write-content'); ed.focus();
+            if(window.savedEditorRange) { const s = window.getSelection(); s.removeAllRanges(); s.addRange(window.savedEditorRange); }
+            document.execCommand('insertHTML', false, `<img src="${b64}" class="max-w-full rounded-[1.5rem] shadow-lg my-6">`);
+        };
+
+        async function compressImg(f, mw, q) {
+            return new Promise(res => {
+                const r = new FileReader(); r.onload = e => {
+                    const i = new Image(); i.onload = () => {
+                        const c = document.createElement('canvas'); let w = i.width, h = i.height;
+                        if(w > mw) { h *= mw/w; w = mw; } c.width = w; c.height = h;
+                        c.getContext('2d').drawImage(i, 0, 0, w, h); res(c.toDataURL('image/jpeg', q));
+                    }; i.src = e.target.result;
+                }; r.readAsDataURL(f);
+            });
         }
 
         window.saveBoardPost = async function() {
             const title = document.getElementById('write-title').value.trim();
             const content = document.getElementById('write-content').innerHTML;
-            if(!title) return showToast('제목을 입력하세요', true);
-            
+            if(!title) return window.showToast('제목을 입력하세요.', true);
             const data = { title, content };
             try {
-                if(window.editingId) {
-                    await window.updateDoc(window.doc(window.db, window.currentBoard, window.editingId), data);
-                    showToast('수정되었습니다.');
-                } else {
-                    data.createdAt = Date.now();
-                    await window.addDoc(window.collection(window.db, window.currentBoard), data);
-                    showToast('등록되었습니다.');
-                }
-                closeModal('write-modal');
-            } catch(e) { showToast('저장 실패', true); }
-        }
-
-        // --- Data Modal (Forms) ---
-        window.showDataModal = async function(col, editId = null) {
-            window.currentCol = col;
-            window.editingId = editId;
-            window.tempImageData = {};
-            const body = document.getElementById('data-modal-body');
-            document.getElementById('data-modal-title').textContent = editId ? '수정' : '등록';
-            
-            let item = {};
-            if(editId) {
-                const docSnap = await window.getDoc(window.doc(window.db, col, editId));
-                if(docSnap.exists()) item = docSnap.data();
-                if(item.image) window.tempImageData['image'] = item.image;
-            }
-
-            const imgField = `
-                <div class="mb-4 text-center">
-                    <label class="cursor-pointer inline-block">
-                        <div class="w-24 h-24 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center overflow-hidden relative mx-auto hover:bg-gray-200 transition">
-                            <img id="form-img-preview" src="${item.image||''}" class="w-full h-full object-contain ${item.image?'':'hidden'}">
-                            <i class="fas fa-camera text-gray-400 text-2xl ${item.image?'hidden':''}"></i>
-                        </div>
-                        <span class="text-xs font-bold text-gray-500 mt-2 block">사진 첨부 (클릭)</span>
-                        <input type="file" class="hidden" accept="image/*" onchange="handleFormImageUpload(event, 'form-img-preview')">
-                    </label>
-                </div>
-            `;
-
-            if(col === 'calendar') {
-                body.innerHTML = `
-                    <div class="mb-3"><label class="block text-sm font-bold text-gray-700 mb-1">일정명</label><input type="text" id="f-caltitle" value="${item.title||''}" class="w-full border rounded p-2 outline-none"></div>
-                    <div class="grid grid-cols-2 gap-3 mb-3">
-                        <div><label class="block text-sm font-bold text-gray-700 mb-1">시작일</label><input type="date" id="f-cals" value="${item.startDate||''}" class="w-full border rounded p-2 outline-none"></div>
-                        <div><label class="block text-sm font-bold text-gray-700 mb-1">종료일</label><input type="date" id="f-cale" value="${item.endDate||''}" class="w-full border rounded p-2 outline-none"></div>
-                    </div>
-                    <div><label class="block text-sm font-bold text-gray-700 mb-1">내용</label><textarea id="f-caldesc" class="w-full border rounded p-2 outline-none h-24">${item.content||''}</textarea></div>
-                `;
-            } 
-            else if(col === 'pet') {
-                body.innerHTML = imgField + `
-                    <div class="mb-3"><label class="block text-xs font-bold text-gray-700 mb-1">페트 이름</label><input type="text" id="f-name" value="${item.name||''}" class="w-full border rounded px-3 py-2 outline-none"></div>
-                    <div class="grid grid-cols-4 gap-2 mb-3">
-                        <div><label class="block text-[10px] font-bold text-blue-500 text-center mb-1">水 (0-10)</label><input type="number" id="f-w" value="${item.attr_w||0}" min="0" max="10" class="w-full border rounded p-1 text-center text-sm"></div>
-                        <div><label class="block text-[10px] font-bold text-yellow-600 text-center mb-1">地 (0-10)</label><input type="number" id="f-e" value="${item.attr_e||0}" min="0" max="10" class="w-full border rounded p-1 text-center text-sm"></div>
-                        <div><label class="block text-[10px] font-bold text-red-500 text-center mb-1">火 (0-10)</label><input type="number" id="f-f" value="${item.attr_f||0}" min="0" max="10" class="w-full border rounded p-1 text-center text-sm"></div>
-                        <div><label class="block text-[10px] font-bold text-green-500 text-center mb-1">風 (0-10)</label><input type="number" id="f-wi" value="${item.attr_wi||0}" min="0" max="10" class="w-full border rounded p-1 text-center text-sm"></div>
-                    </div>
-                    <div class="grid grid-cols-4 gap-2 mb-3">
-                        <div><label class="block text-[10px] text-gray-500 text-center mb-1">체력</label><input type="number" id="f-hp" value="${item.hp||''}" class="w-full border rounded p-1 text-center text-sm"></div>
-                        <div><label class="block text-[10px] text-gray-500 text-center mb-1">공격</label><input type="number" id="f-atk" value="${item.atk||''}" class="w-full border rounded p-1 text-center text-sm"></div>
-                        <div><label class="block text-[10px] text-gray-500 text-center mb-1">방어</label><input type="number" id="f-def" value="${item.def||''}" class="w-full border rounded p-1 text-center text-sm"></div>
-                        <div><label class="block text-[10px] text-gray-500 text-center mb-1">순발</label><input type="number" id="f-agi" value="${item.agi||''}" class="w-full border rounded p-1 text-center text-sm"></div>
-                    </div>
-                    <div class="grid grid-cols-4 gap-2 mb-3">
-                        <div><label class="block text-[10px] font-bold text-brand-gold text-center mb-1">성장 체력</label><input type="number" step="0.001" id="f-ghp" value="${item.ghp||''}" class="w-full border rounded p-1 text-center text-sm text-brand-gold font-bold"></div>
-                        <div><label class="block text-[10px] font-bold text-brand-gold text-center mb-1">성장 공격</label><input type="number" step="0.001" id="f-gatk" value="${item.gatk||''}" class="w-full border rounded p-1 text-center text-sm text-brand-gold font-bold"></div>
-                        <div><label class="block text-[10px] font-bold text-brand-gold text-center mb-1">성장 방어</label><input type="number" step="0.001" id="f-gdef" value="${item.gdef||''}" class="w-full border rounded p-1 text-center text-sm text-brand-gold font-bold"></div>
-                        <div><label class="block text-[10px] font-bold text-brand-gold text-center mb-1">성장 순발</label><input type="number" step="0.001" id="f-gagi" value="${item.gagi||''}" class="w-full border rounded p-1 text-center text-sm text-brand-gold font-bold"></div>
-                    </div>
-                    <div><label class="block text-[10px] font-bold text-gray-500 mb-1">총성장률</label><input type="number" step="0.001" id="f-total" value="${item.total||''}" class="w-full border rounded p-2 text-brand-gold font-black"></div>
-                `;
-            }
-            else if(col === 'character') {
-                body.innerHTML = `<label class="block text-sm font-bold text-gray-700 mb-1">추가할 캐릭터명</label><input type="text" id="f-cname" class="w-full border rounded p-3 outline-none">`;
-            }
-            else if(col === 'ride') {
-                const cbs = window.allCharacters.map(c => `
-                    <label class="flex items-center p-2 border rounded hover:bg-gray-50 cursor-pointer">
-                        <input type="checkbox" class="cb-chars mr-2 w-4 h-4" value="${c.id}" ${(item.chars||[]).includes(c.id)?'checked':''}>
-                        <span class="text-sm font-medium">${c.name}</span>
-                    </label>
-                `).join('');
-                body.innerHTML = imgField + `
-                    <div class="mb-3"><label class="block text-sm font-bold text-gray-700 mb-1">탑승 페트 이름</label><input type="text" id="f-rname" value="${item.name||''}" class="w-full border rounded p-2 outline-none"></div>
-                    <div><label class="block text-sm font-bold text-gray-700 mb-2">탑승 가능한 캐릭터 선택 (다중)</label><div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar border p-2 rounded bg-gray-50">${cbs}</div></div>
-                `;
-            }
-            else if(col === 'items') {
-                body.innerHTML = imgField + `
-                    <div class="mb-3"><label class="block text-sm font-bold text-gray-700 mb-1">아이템명</label><input type="text" id="f-iname" value="${item.name||''}" class="w-full border rounded p-2 outline-none"></div>
-                    <div><label class="block text-sm font-bold text-gray-700 mb-1">효과/설명</label><textarea id="f-idesc" class="w-full border rounded p-2 outline-none h-24">${item.desc||''}</textarea></div>
-                `;
-            }
-            else if(col === 'exchange') {
-                body.innerHTML = imgField + `
-                    <div class="mb-3"><label class="block text-sm font-bold text-gray-700 mb-1">분류</label><select id="f-etype" class="w-full border rounded p-2 outline-none">${['구매','판매','즉시구매'].map(t=>`<option value="${t}" ${item.type===t?'selected':''}>${t}</option>`).join('')}</select></div>
-                    <div class="mb-3"><label class="block text-sm font-bold text-gray-700 mb-1">이름 (물품명)</label><input type="text" id="f-ename" value="${item.name||''}" class="w-full border rounded p-2 outline-none"></div>
-                    <div class="mb-3"><label class="block text-sm font-bold text-gray-700 mb-1">금액 (VIP)</label><input type="number" id="f-eprice" value="${item.price||''}" class="w-full border rounded p-2 outline-none text-brand-gold font-bold"></div>
-                    <div class="mb-3"><label class="block text-sm font-bold text-[#5865F2] mb-1"><i class="fab fa-discord"></i> 디스코드</label><input type="text" id="f-edc" value="${item.dc||''}" class="w-full border rounded p-2 outline-none"></div>
-                    <div><label class="block text-sm font-bold text-gray-700 mb-1">설명</label><textarea id="f-edesc" class="w-full border rounded p-2 outline-none h-20">${item.desc||''}</textarea></div>
-                `;
-            }
-            document.getElementById('data-modal').classList.remove('hidden');
-        }
-
-        window.saveData = async function() {
-            try {
-                let data = {};
-                const c = window.currentCol;
-
-                if(c === 'calendar') {
-                    data = { title: document.getElementById('f-caltitle').value, startDate: document.getElementById('f-cals').value, endDate: document.getElementById('f-cale').value, content: document.getElementById('f-caldesc').value };
-                    if(!data.title || !data.startDate) throw "필수 항목을 입력하세요";
-                }
-                else if(c === 'pet') {
-                    data = { name: document.getElementById('f-name').value, hp: document.getElementById('f-hp').value, atk: document.getElementById('f-atk').value, def: document.getElementById('f-def').value, agi: document.getElementById('f-agi').value, ghp: document.getElementById('f-ghp').value, gatk: document.getElementById('f-gatk').value, gdef: document.getElementById('f-gdef').value, gagi: document.getElementById('f-gagi').value, total: document.getElementById('f-total').value, image: window.tempImageData['image']||'' };
-                    ['w','e','f','wi'].forEach(k => data[`attr_${k}`] = document.getElementById(`f-${k}`).value);
-                    if(!data.name) throw "이름을 입력하세요";
-                }
-                else if(c === 'character') {
-                    data = { name: document.getElementById('f-cname').value };
-                    if(!data.name) throw "이름을 입력하세요";
-                }
-                else if(c === 'ride') {
-                    data = { name: document.getElementById('f-rname').value, image: window.tempImageData['image']||'', chars: Array.from(document.querySelectorAll('.cb-chars:checked')).map(cb=>cb.value) };
-                    if(!data.name) throw "이름을 입력하세요";
-                }
-                else if(c === 'items') {
-                    data = { name: document.getElementById('f-iname').value, desc: document.getElementById('f-idesc').value, image: window.tempImageData['image']||'' };
-                    if(!data.name) throw "이름을 입력하세요";
-                }
-                else if(c === 'exchange') {
-                    data = { type: document.getElementById('f-etype').value, name: document.getElementById('f-ename').value, price: document.getElementById('f-eprice').value, dc: document.getElementById('f-edc').value, desc: document.getElementById('f-edesc').value, image: window.tempImageData['image']||'', uid: window.currentUser.uid };
-                    if(!data.name || !data.price || !data.dc) throw "필수 항목을 입력하세요";
-                }
-
-                if(!window.editingId && c !== 'exchange') data.createdAt = Date.now();
-                if(c === 'exchange' && !window.editingId) data.createdAt = Date.now();
-
-                if(window.editingId) {
-                    // 이미지 수정 안했을시 기존유지
-                    if(data.image === '' && window.tempImageData['image'] === undefined) {
-                        const snap = await window.getDoc(window.doc(window.db, c, window.editingId));
-                        if(snap.exists()) data.image = snap.data().image || '';
-                    }
-                    await window.updateDoc(window.doc(window.db, c, window.editingId), data);
-                    showToast('수정되었습니다.');
-                } else {
-                    await window.addDoc(window.collection(window.db, c), data);
-                    showToast('등록되었습니다.');
-                }
-                closeModal('data-modal');
-            } catch(e) { showToast(typeof e==='string'?e:"오류가 발생했습니다.", true); }
-        }
-
-        window.deleteData = function(col, id) {
-            window.showCustomConfirm('삭제 확인', '정말로 삭제하시겠습니까?', true, async () => {
-                await window.deleteDoc(window.doc(window.db, col, id));
-                showToast('삭제되었습니다.');
-            });
-        }
-
-        // --- Gallery Rendering ---
-        const drawBar = (val, color) => {
-            let b = '';
-            for(let i=0; i<10; i++) b += `<div class="w-full h-1.5 rounded-sm ${i<val?color:'bg-gray-800'}"></div>`;
-            return `<div class="flex gap-[2px] w-full px-1">${b}</div>`;
+                if(window.editingId) await window.updateDoc(window.doc(window.db, window.currentBoard, window.editingId), data);
+                else { data.createdAt = Date.now(); await window.addDoc(window.collection(window.db, window.currentBoard), data); }
+                window.showToast('저장 완료'); window.closeModal('write-modal');
+            } catch(e) { window.showToast('저장 실패', true); }
         };
 
-        window.filterPets = function() {
-            const term = document.getElementById('pet-search').value.toLowerCase();
-            const filtered = window.allPets.filter(p => p.name.toLowerCase().includes(term));
-            const gal = document.getElementById('pet-gallery');
-            gal.innerHTML = filtered.map(p => `
-                <div class="bg-gray-900 rounded-2xl overflow-hidden shadow-xl text-white relative group border border-gray-800 flex flex-col">
-                    <div class="admin-only ${window.isAdmin?'':'hidden'} absolute top-2 right-2 z-10 flex gap-1">
-                        <button onclick="showDataModal('pet', '${p.id}')" class="bg-black/50 hover:bg-blue-500 p-1.5 rounded text-white"><i class="fas fa-pen text-xs"></i></button>
-                        <button onclick="deleteData('pet', '${p.id}')" class="bg-black/50 hover:bg-red-500 p-1.5 rounded text-white"><i class="fas fa-trash text-xs"></i></button>
-                    </div>
-                    <div class="h-40 bg-gray-800 flex justify-center items-center p-4 relative">
-                        <img src="${p.image||'https://placehold.co/200?text=PET'}" class="max-h-full cursor-pointer hover:scale-110 transition" onclick="openLightbox(this.src)">
-                    </div>
-                    <div class="p-4 bg-gray-900 flex-grow flex flex-col">
-                        <h4 class="font-black text-lg mb-2 text-center">${p.name}</h4>
-                        <div class="space-y-1 mb-3">
-                            <div class="flex items-center"><span class="w-6 text-xs font-bold text-blue-400">水</span>${drawBar(p.attr_w,'bg-blue-500')}</div>
-                            <div class="flex items-center"><span class="w-6 text-xs font-bold text-yellow-600">地</span>${drawBar(p.attr_e,'bg-yellow-600')}</div>
-                            <div class="flex items-center"><span class="w-6 text-xs font-bold text-red-500">火</span>${drawBar(p.attr_f,'bg-red-500')}</div>
-                            <div class="flex items-center"><span class="w-6 text-xs font-bold text-green-500">風</span>${drawBar(p.attr_wi,'bg-green-500')}</div>
-                        </div>
-                        <div class="grid grid-cols-4 gap-1 mb-2 text-center text-xs">
-                            <div class="border border-gray-700 bg-gray-800 rounded p-1"><div class="text-gray-400 scale-75">공격</div><div class="font-bold">${p.atk||'-'}</div></div>
-                            <div class="border border-gray-700 bg-gray-800 rounded p-1"><div class="text-gray-400 scale-75">방어</div><div class="font-bold">${p.def||'-'}</div></div>
-                            <div class="border border-gray-700 bg-gray-800 rounded p-1"><div class="text-gray-400 scale-75">순발</div><div class="font-bold">${p.agi||'-'}</div></div>
-                            <div class="border border-gray-700 bg-gray-800 rounded p-1"><div class="text-gray-400 scale-75">체력</div><div class="font-bold">${p.hp||'-'}</div></div>
-                        </div>
-                        <div class="mt-auto flex justify-between items-center border border-gray-700 rounded bg-gray-800 p-2">
-                            <span class="text-xs text-gray-400">총성장</span><span class="font-black text-brand-gold">${p.total||'-'}</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
+        window.showWriteModal = async function(id = null) {
+            window.editingId = id; document.getElementById('write-title').value = ''; document.getElementById('write-content').innerHTML = '';
+            if(id) {
+                const snap = await window.getDoc(window.doc(window.db, window.currentBoard, id));
+                if(snap.exists()) { document.getElementById('write-title').value = snap.data().title; document.getElementById('write-content').innerHTML = snap.data().content; }
+            }
+            document.getElementById('write-modal').classList.remove('hidden');
+        };
+
+        window.viewBoardPost = async function(col, id) {
+            const snap = await window.getDoc(window.doc(window.db, col, id)); if(!snap.exists()) return;
+            const data = snap.data(); document.getElementById('view-modal-title').textContent = data.title;
+            document.getElementById('view-modal-date').textContent = col === 'calendar' ? `${data.startDate} ~ ${data.endDate}` : new Date(data.createdAt).toLocaleDateString();
+            document.getElementById('view-modal-content').innerHTML = data.content || '';
+            document.getElementById('view-modal-content').querySelectorAll('img').forEach(img => {
+                img.classList.add('cursor-pointer'); img.onclick = () => window.openLightbox(img.src);
+            });
+            document.getElementById('view-modal').classList.remove('hidden');
+        };
+
+        window.deleteData = function(col, id) {
+            window.showCustomConfirm('삭제 확인', '정말 삭제하시겠습니까?', true, async () => {
+                await window.deleteDoc(window.doc(window.db, col, id)); window.showToast('삭제되었습니다.');
+            });
+        };
+
+        window.showCustomConfirm = function(t, m, isD, cb) {
+            document.getElementById('confirm-title').textContent = t; document.getElementById('confirm-msg').innerHTML = m;
+            const b = document.getElementById('confirm-btn');
+            b.className = `flex-1 px-4 py-4 rounded-2xl font-black text-white shadow-xl ${isD ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`;
+            window.confirmCallback = cb; document.getElementById('confirm-modal').classList.remove('hidden');
+        };
+        window.executeConfirm = function() { window.closeModal('confirm-modal'); if(window.confirmCallback) window.confirmCallback(); };
 
         window.filterCharacters = function() {
-            const term = document.getElementById('char-search').value.toLowerCase();
-            const list = document.getElementById('character-list');
-            list.innerHTML = window.allCharacters.filter(c=>c.name.toLowerCase().includes(term)).map(c => `
-                <li class="flex justify-between items-center p-3 border rounded cursor-pointer transition ${selectedCharIdForRide===c.id?'bg-blue-50 border-blue-400 text-blue-700 font-bold':'bg-white hover:bg-gray-50'}" onclick="selectChar('${c.id}', '${c.name}')">
+            const term = document.getElementById('char-search')?.value.toLowerCase() || '';
+            const list = document.getElementById('character-list'); if(!list) return;
+            list.innerHTML = window.allCharacters.filter(c => c.name.toLowerCase().includes(term)).map(c => `
+                <li class="flex justify-between items-center p-4 border rounded-2xl cursor-pointer transition ${window.selectedCharIdForRide === c.id ? 'bg-blue-50 border-blue-400 text-blue-700 font-black' : 'bg-white hover:bg-gray-50'}" onclick="window.selectCharForRide('${c.id}', '${c.name}')">
                     <span>${c.name}</span>
-                    <button onclick="deleteData('character','${c.id}'); event.stopPropagation();" class="admin-only ${window.isAdmin?'':'hidden'} text-red-400 hover:text-red-600 p-1"><i class="fas fa-trash text-xs"></i></button>
-                </li>
-            `).join('');
-        }
-        
-        window.selectChar = function(id, name) {
-            selectedCharIdForRide = selectedCharIdForRide === id ? null : id;
-            document.getElementById('ride-title').textContent = selectedCharIdForRide ? `[${name}] 탑승 페트` : '탑승 가능한 페트';
-            window.filterCharacters();
-            window.filterRidePets();
-        }
+                    <button onclick="window.deleteData('character','${c.id}'); event.stopPropagation();" class="admin-only ${window.isAdmin?'':'hidden'} text-red-400 hover:text-red-600 p-1"><i class="fas fa-trash text-xs"></i></button>
+                </li>`).join('');
+            window.updateAdminUI();
+        };
+
+        window.selectCharForRide = function(id, name) {
+            window.selectedCharIdForRide = (window.selectedCharIdForRide === id ? null : id);
+            document.getElementById('ride-title').textContent = window.selectedCharIdForRide ? `[${name}] 탑승 페트` : '탑승 가능한 페트';
+            window.filterCharacters(); window.filterRidePets();
+        };
 
         window.filterRidePets = function() {
-            const term = document.getElementById('ride-pet-search').value.toLowerCase();
-            const gal = document.getElementById('ride-pet-gallery');
-            const filtered = window.allRidePets.filter(p => {
-                const mName = p.name.toLowerCase().includes(term);
-                const mChar = selectedCharIdForRide ? (p.chars||[]).includes(selectedCharIdForRide) : true;
-                return mName && mChar;
-            });
+            const gal = document.getElementById('ride-pet-gallery'); if(!gal) return;
+            const filtered = window.allRidePets.filter(p => window.selectedCharIdForRide ? (p.chars || []).includes(window.selectedCharIdForRide) : true);
             gal.innerHTML = filtered.map(p => `
-                <div class="bg-white border rounded-xl overflow-hidden shadow-sm relative group">
-                    <div class="admin-only ${window.isAdmin?'':'hidden'} absolute top-1 right-1 z-10 flex gap-1">
-                        <button onclick="showDataModal('ride', '${p.id}')" class="bg-white/90 text-blue-500 p-1.5 rounded"><i class="fas fa-pen text-xs"></i></button>
-                        <button onclick="deleteData('ride', '${p.id}')" class="bg-white/90 text-red-500 p-1.5 rounded"><i class="fas fa-trash text-xs"></i></button>
+                <div class="bg-white border border-gray-100 rounded-[1.5rem] overflow-hidden shadow-sm relative group">
+                    <div class="admin-only ${window.isAdmin?'':'hidden'} absolute top-2 right-2 z-10 flex gap-2">
+                        <button onclick="window.showDataModal('ride', '${p.id}')" class="bg-white/90 text-blue-500 p-2 rounded-xl shadow-sm"><i class="fas fa-edit text-xs"></i></button>
+                        <button onclick="window.deleteData('ride', '${p.id}')" class="bg-white/90 text-red-500 p-2 rounded-xl shadow-sm"><i class="fas fa-trash text-xs"></i></button>
                     </div>
-                    <div class="h-28 bg-gray-50 flex items-center justify-center p-2 border-b"><img src="${p.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition" onclick="openLightbox(this.src)"></div>
-                    <div class="p-2 text-center font-bold text-sm text-gray-800 truncate">${p.name}</div>
-                </div>
-            `).join('') || `<div class="col-span-full text-center text-gray-400 py-10">결과가 없습니다.</div>`;
-        }
+                    <div class="h-36 bg-gray-50/50 flex items-center justify-center p-6 border-b border-gray-50"><img src="${p.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition duration-500" onclick="window.openLightbox(this.src)"></div>
+                    <div class="p-4 text-center font-black text-gray-800 truncate">${p.name}</div>
+                </div>`).join('') || `<div class="col-span-full text-center text-gray-300 py-24 font-black">데이터가 없습니다.</div>`;
+            window.updateAdminUI();
+        };
 
         window.filterItems = function() {
-            const term = document.getElementById('item-search').value.toLowerCase();
-            const gal = document.getElementById('item-gallery');
-            gal.innerHTML = window.allItems.filter(i=>i.name.toLowerCase().includes(term)).map(item => `
-                <div class="bg-white border rounded-xl shadow-sm overflow-hidden relative">
-                    <div class="admin-only ${window.isAdmin?'':'hidden'} absolute top-1 right-1 z-10 flex gap-1">
-                        <button onclick="showDataModal('items', '${item.id}')" class="bg-white/90 text-blue-500 p-1.5 rounded"><i class="fas fa-pen text-xs"></i></button>
-                        <button onclick="deleteData('items', '${item.id}')" class="bg-white/90 text-red-500 p-1.5 rounded"><i class="fas fa-trash text-xs"></i></button>
+            const gal = document.getElementById('item-gallery'); if(!gal) return;
+            gal.innerHTML = window.allItems.map(item => `
+                <div class="bg-white border border-gray-100 rounded-[1.5rem] shadow-sm overflow-hidden relative">
+                    <div class="admin-only ${window.isAdmin?'':'hidden'} absolute top-2 right-2 z-10 flex gap-2">
+                        <button onclick="window.showDataModal('items', '${item.id}')" class="bg-white/90 text-blue-500 p-2 rounded-xl"><i class="fas fa-edit text-xs"></i></button>
+                        <button onclick="window.deleteData('items', '${item.id}')" class="bg-white/90 text-red-500 p-2 rounded-xl"><i class="fas fa-trash text-xs"></i></button>
                     </div>
-                    <div class="h-28 bg-gray-50 flex items-center justify-center p-4"><img src="${item.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition drop-shadow" onclick="openLightbox(this.src)"></div>
-                    <div class="p-3 border-t"><h4 class="font-black text-sm truncate">${item.name}</h4><p class="text-xs text-gray-500 line-clamp-2 mt-1">${item.desc}</p></div>
-                </div>
-            `).join('');
-        }
+                    <div class="h-36 bg-gray-50/50 flex items-center justify-center p-6 border-b border-gray-50"><img src="${item.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition duration-500" onclick="window.openLightbox(this.src)"></div>
+                    <div class="p-5"><h4 class="font-black text-sm truncate">${item.name}</h4><p class="text-[10px] text-gray-400 line-clamp-2 mt-1 font-bold">${item.desc || ''}</p></div>
+                </div>`).join('');
+            window.updateAdminUI();
+        };
 
         window.switchExchangeTab = function(tab) {
             window.currentExchangeTab = tab;
-            ['tab-buy', 'tab-sell', 'tab-instant'].forEach(id => document.getElementById(id).classList.remove('text-blue-600', 'border-blue-600'));
-            document.getElementById({'구매':'tab-buy','판매':'tab-sell','즉시구매':'tab-instant'}[tab]).classList.add('text-blue-600', 'border-blue-600');
-            
-            const tbody = document.getElementById('exchange-list');
-            const color = {'구매':'bg-blue-100 text-blue-700', '판매':'bg-red-100 text-red-700', '즉시구매':'bg-yellow-100 text-yellow-700'}[tab];
-            
-            tbody.innerHTML = window.allExchanges.filter(e=>e.type===tab).map(item => {
+            ['tab-buy', 'tab-sell', 'tab-instant'].forEach(id => document.getElementById(id).classList.remove('text-blue-600', 'border-blue-600', 'bg-blue-50/50'));
+            document.getElementById({'구매':'tab-buy','판매':'tab-sell','즉시구매':'tab-instant'}[tab]).classList.add('text-blue-600', 'border-blue-600', 'bg-blue-50/50');
+            const tbody = document.getElementById('exchange-list'); const color = {'구매':'bg-blue-100 text-blue-700', '판매':'bg-red-100 text-red-700', '즉시구매':'bg-yellow-100 text-yellow-700'}[tab];
+            tbody.innerHTML = window.allExchanges.filter(e => e.type === tab).map(item => {
                 const canManage = window.isAdmin || (window.currentUser && item.uid === window.currentUser.uid);
-                return `
-                <tr class="hover:bg-gray-50 border-b border-gray-100">
-                    <td class="p-4 text-center"><span class="px-2 py-1 rounded text-xs font-bold ${color}">${item.type}</span></td>
-                    <td class="p-4 text-center">${item.image?`<img src="${item.image}" class="w-10 h-10 object-cover rounded cursor-pointer mx-auto" onclick="openLightbox(this.src)">`:'-'}</td>
-                    <td class="p-4 font-bold text-gray-800">${item.name}</td>
-                    <td class="p-4 text-sm text-gray-600 truncate max-w-[200px]">${item.desc}</td>
-                    <td class="p-4 text-center font-black text-brand-gold">${item.price}</td>
-                    <td class="p-4 text-center text-sm font-bold text-[#5865F2]">${item.dc}</td>
-                    <td class="p-4 text-center">
-                        ${canManage ? `
-                        <button onclick="showDataModal('exchange', '${item.id}')" class="text-blue-500 p-1"><i class="fas fa-pen"></i></button>
-                        <button onclick="deleteData('exchange', '${item.id}')" class="text-red-500 p-1"><i class="fas fa-trash"></i></button>
-                        ` : '-'}
-                    </td>
-                </tr>
-            `}).join('') || `<tr><td colspan="7" class="text-center p-8 text-gray-400 bg-white">거래 내역이 없습니다.</td></tr>`;
-        }
+                return `<tr class="hover:bg-gray-50 border-b border-gray-50 transition"><td class="p-6 text-center"><span class="px-3 py-1.5 rounded-xl text-[10px] font-black ${color}">${item.type}</span></td><td class="p-6 text-center">${item.image?`<img src="${item.image}" class="w-14 h-14 object-cover rounded-[1.2rem] cursor-pointer mx-auto shadow-md" onclick="window.openLightbox(this.src)">`:'-'}</td><td class="p-6 font-black text-gray-800">${item.name}</td><td class="p-6 text-sm text-gray-400 font-bold truncate max-w-xs">${item.desc}</td><td class="p-6 text-center font-black text-brand-gold text-lg">${item.price} VIP</td><td class="p-6 text-center text-sm font-black text-[#5865F2]"><i class="fab fa-discord mr-1"></i>${item.dc}</td><td class="p-6 text-center">${canManage ? `<button onclick="window.showDataModal('exchange', '${item.id}')" class="text-blue-500 hover:bg-blue-50 p-3 rounded-2xl transition"><i class="fas fa-edit"></i></button><button onclick="window.deleteData('exchange', '${item.id}')" class="text-red-500 hover:bg-red-50 p-3 rounded-2xl transition"><i class="fas fa-trash"></i></button>` : '-'}</td></tr>`;
+            }).join('') || `<tr><td colspan="7" class="text-center p-24 text-gray-300 font-black">거래 내역이 없습니다.</td></tr>`;
+        };
 
+        window.showDataModal = async function(col, editId = null) {
+            window.currentCol = col; window.editingId = editId; window.tempImageData = {};
+            const body = document.getElementById('data-modal-body'); document.getElementById('data-modal-title').textContent = editId ? '수정' : '등록';
+            let item = {}; if(editId) { const snap = await window.getDoc(window.doc(window.db, col, editId)); if(snap.exists()) item = snap.data(); if(item.image) window.tempImageData['image'] = item.image; }
+            const imgField = `<div class="mb-8 text-center"><label class="cursor-pointer inline-block"><div class="w-32 h-32 bg-gray-50 border-2 border-dashed border-gray-200 rounded-[2rem] flex items-center justify-center overflow-hidden relative mx-auto hover:border-blue-400 transition"><img id="form-img-preview" src="${item.image||''}" class="w-full h-full object-contain ${item.image?'':'hidden'}"><i class="fas fa-camera text-gray-300 text-3xl ${item.image?'hidden':''}"></i></div><p class="text-[10px] font-black text-gray-400 mt-3 uppercase tracking-widest">사진 첨부</p><input type="file" class="hidden" accept="image/*" onchange="window.handleFormImg(event, 'form-img-preview')"></label></div>`;
+            
+            if(col === 'calendar') { body.innerHTML = `<div class="space-y-6"><div><label class="text-[10px] font-black text-gray-400 mb-2 block uppercase ml-1">일정 제목</label><input type="text" id="f-caltitle" value="${item.title||''}" class="w-full border border-gray-100 rounded-2xl p-5 outline-none font-bold"></div><div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] font-black text-gray-400 mb-2 block ml-1">시작일</label><input type="date" id="f-cals" value="${item.startDate||''}" class="w-full border border-gray-100 rounded-2xl p-5 outline-none font-bold"></div><div><label class="text-[10px] font-black text-gray-400 mb-2 block ml-1">종료일</label><input type="date" id="f-cale" value="${item.endDate||''}" class="w-full border border-gray-100 rounded-2xl p-5 outline-none font-bold"></div></div><div><label class="text-[10px] font-black text-gray-400 mb-2 block ml-1">상세 내용</label><textarea id="f-caldesc" class="w-full border border-gray-100 rounded-2xl p-5 outline-none h-32 font-bold">${item.content||''}</textarea></div></div>`; }
+            else if(col === 'pet') { body.innerHTML = imgField + `<div class="space-y-4"><div><input type="text" id="f-name" value="${item.name||''}" class="w-full border border-gray-100 rounded-2xl p-5 outline-none font-black text-center text-xl" placeholder="페트 이름"></div><div class="grid grid-cols-4 gap-2"><div><label class="block text-[10px] font-black text-blue-500 text-center mb-1">水</label><input type="number" id="f-w" value="${item.attr_w||0}" class="w-full border rounded-xl p-2 text-center font-black"></div><div><label class="block text-[10px] font-black text-yellow-600 text-center mb-1">地</label><input type="number" id="f-e" value="${item.attr_e||0}" class="w-full border rounded-xl p-2 text-center font-black"></div><div><label class="block text-[10px] font-black text-red-500 text-center mb-1">火</label><input type="number" id="f-f" value="${item.attr_f||0}" class="w-full border rounded-xl p-2 text-center font-black"></div><div><label class="block text-[10px] font-black text-green-500 text-center mb-1">風</label><input type="number" id="f-wi" value="${item.attr_wi||0}" class="w-full border rounded-xl p-2 text-center font-black"></div></div><div><label class="block text-[10px] font-black text-brand-gold mb-1 ml-1">총성장률</label><input type="number" step="0.001" id="f-total" value="${item.total||''}" class="w-full border border-gray-100 rounded-2xl p-5 outline-none font-black text-2xl text-brand-gold text-center"></div></div>`; }
+            else if(col === 'character') { body.innerHTML = `<div><label class="text-[10px] font-black text-gray-400 mb-2 block ml-1">캐릭터 이름</label><input type="text" id="f-cname" value="${item.name||''}" class="w-full border border-gray-100 rounded-2xl p-5 font-black text-center text-xl outline-none"></div>`; }
+            else if(col === 'ride') { const cbs = window.allCharacters.map(c => `<label class="flex items-center p-3 border border-gray-50 rounded-2xl hover:bg-gray-50 cursor-pointer transition"><input type="checkbox" class="cb-chars mr-3 w-5 h-5 rounded-lg" value="${c.id}" ${(item.chars||[]).includes(c.id)?'checked':''}><span class="text-sm font-black text-gray-700">${c.name}</span></label>`).join(''); body.innerHTML = imgField + `<div class="space-y-6"><div><label class="text-[10px] font-black text-gray-400 mb-2 block ml-1">탑승 페트 이름</label><input type="text" id="f-rname" value="${item.name||''}" class="w-full border border-gray-100 rounded-2xl p-5 font-black text-center text-xl outline-none"></div><div><label class="text-[10px] font-black text-gray-400 mb-3 block ml-1 uppercase tracking-widest">탑승 가능한 캐릭터 (중복 가능)</label><div class="grid grid-cols-2 gap-3 max-h-52 overflow-y-auto custom-scrollbar border border-gray-100 p-4 rounded-[1.5rem] bg-gray-50/50">${cbs}</div></div></div>`; }
+            else if(col === 'items') { body.innerHTML = imgField + `<div class="space-y-6"><div><label class="text-[10px] font-black text-gray-400 mb-2 block ml-1">아이템명</label><input type="text" id="f-iname" value="${item.name||''}" class="w-full border border-gray-100 rounded-2xl p-5 font-black text-center text-xl outline-none"></div><div><label class="text-[10px] font-black text-gray-400 mb-2 block ml-1">효과 설명</label><textarea id="f-idesc" class="w-full border border-gray-100 rounded-2xl p-5 h-32 font-bold outline-none">${item.desc||''}</textarea></div></div>`; }
+            else if(col === 'exchange') { body.innerHTML = imgField + `<div class="space-y-5"><div><label class="text-[10px] font-black text-gray-400 mb-1 ml-1">거래 분류</label><select id="f-etype" class="w-full border border-gray-100 rounded-2xl p-5 font-black outline-none">${['구매','판매','즉시구매'].map(t=>`<option value="${t}" ${item.type===t?'selected':''}>${t}</option>`).join('')}</select></div><div><label class="text-[10px] font-black text-gray-400 mb-1 ml-1">물품명</label><input type="text" id="f-ename" value="${item.name||''}" class="w-full border border-gray-100 rounded-2xl p-5 font-black outline-none"></div><div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] font-black text-brand-gold mb-1 ml-1">희망 가격(VIP)</label><input type="number" id="f-eprice" value="${item.price||''}" class="w-full border border-gray-100 rounded-2xl p-5 font-black text-brand-gold text-lg outline-none"></div><div><label class="text-[10px] font-black text-[#5865F2] mb-1 ml-1">디스코드 닉네임</label><input type="text" id="f-edc" value="${item.dc||''}" class="w-full border border-gray-100 rounded-2xl p-5 font-black outline-none"></div></div><div><label class="text-[10px] font-black text-gray-400 mb-1 ml-1">상세 설명</label><textarea id="f-edesc" class="w-full border border-gray-100 rounded-2xl p-5 h-24 font-bold outline-none">${item.desc||''}</textarea></div></div>`; }
+            document.getElementById('data-modal').classList.remove('hidden');
+        };
+
+        window.handleFormImg = async function(e, pid) {
+            const f = e.target.files[0]; if(!f) return;
+            const b64 = await compressImg(f, 400, 0.7);
+            const pv = document.getElementById(pid); pv.src = b64; pv.classList.remove('hidden');
+            window.tempImageData['image'] = b64;
+        };
+
+        window.saveData = async function() {
+            try {
+                let d = {}; const c = window.currentCol;
+                if(c === 'calendar') { d = { title: document.getElementById('f-caltitle').value, startDate: document.getElementById('f-cals').value, endDate: document.getElementById('f-cale').value, content: document.getElementById('f-caldesc').value }; }
+                else if(c === 'pet') { d = { name: document.getElementById('f-name').value, total: document.getElementById('f-total').value, image: window.tempImageData['image']||'' }; ['w','e','f','wi'].forEach(k => d[`attr_${k}`] = document.getElementById(`f-${k}`).value); }
+                else if(c === 'character') { d = { name: document.getElementById('f-cname').value }; }
+                else if(c === 'ride') { d = { name: document.getElementById('f-rname').value, image: window.tempImageData['image']||'', chars: Array.from(document.querySelectorAll('.cb-chars:checked')).map(cb=>cb.value) }; }
+                else if(c === 'items') { d = { name: document.getElementById('f-iname').value, desc: document.getElementById('f-idesc').value, image: window.tempImageData['image']||'' }; }
+                else if(c === 'exchange') { d = { type: document.getElementById('f-etype').value, name: document.getElementById('f-ename').value, price: document.getElementById('f-eprice').value, dc: document.getElementById('f-edc').value, desc: document.getElementById('f-edesc').value, image: window.tempImageData['image']||'', uid: window.currentUser.uid }; }
+
+                if(!window.editingId) d.createdAt = Date.now();
+                if(window.editingId) await window.updateDoc(window.doc(window.db, c, window.editingId), d);
+                else await window.addDoc(window.collection(window.db, c), d);
+                window.closeModal('data-modal'); window.showToast('등록되었습니다.');
+            } catch(e) { window.showToast('내용을 확인해주세요.', true); }
+        };
+
+        window.showAdminSettings = function() {
+            const l = document.getElementById('admin-cat-list');
+            l.innerHTML = window.allCategories.map(c => `<li class="flex justify-between items-center p-4 bg-gray-50 rounded-2xl border border-gray-100"><span class="font-black text-gray-700">${c.name} (${c.id})</span><button onclick="window.deleteData('categories', '${c.id}')" class="text-red-400 hover:text-red-600 transition p-2"><i class="fas fa-trash"></i></button></li>`).join('');
+            document.getElementById('admin-modal').classList.remove('hidden');
+        };
+
+        window.addCategory = async function() {
+            const n = document.getElementById('new-cat-name').value;
+            const i = document.getElementById('new-cat-id').value;
+            if(!n || !i) return window.showToast('정보를 입력하세요', true);
+            await window.setDoc(window.doc(window.db, "categories", i), { name: n, id: i, createdAt: Date.now() });
+            window.showToast('추가되었습니다.');
+        };
     </script>
 </body>
 </html>
