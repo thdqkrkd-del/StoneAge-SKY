@@ -31,7 +31,7 @@
 </head>
 <body class="text-gray-800 antialiased flex flex-col min-h-screen">
 
-    <!-- 무한 로딩 방지용 로더 -->
+    <!-- 초기 로딩 화면 -->
     <div id="initial-loader" class="fixed inset-0 bg-white z-[12000] flex justify-center items-center">
         <div class="text-center">
             <div class="inline-block w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
@@ -39,7 +39,7 @@
         </div>
     </div>
 
-    <!-- 사진 디자인을 완벽 반영한 로그인 오버레이 -->
+    <!-- 로그인 오버레이 (이미지 디자인 완벽 반영) -->
     <div id="auth-overlay" class="fixed inset-0 bg-[url('KakaoTalk_20260514_002507728.jpg')] bg-cover bg-center z-[10000] flex justify-center items-center hidden">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-md"></div>
         <div class="bg-white/95 p-10 rounded-[2.5rem] shadow-2xl w-full max-w-sm relative z-10 fade-in border border-white/40">
@@ -99,15 +99,13 @@
         </div>
     </header>
 
-    <!-- Main Content Area -->
     <main class="flex-grow container mx-auto px-4 py-8">
         <!-- Home Section -->
         <section id="page-home" class="page-section fade-in">
-            <!-- 배너 크기 확장: max-w-6xl -> max-w-7xl, 비율 조정 -->
+            <!-- 시원하게 키운 대형 배너 -->
             <div class="max-w-7xl mx-auto rounded-[2.5rem] overflow-hidden shadow-2xl mb-12 bg-black relative group">
-                <img src="Gemini_Generated_Image_4fot0k4fot0k4fot.png" class="w-full h-full object-cover opacity-90 transition duration-1000 group-hover:scale-105" alt="Banner">
-                <!-- 하단 그라데이션 효과 추가로 텍스트 가독성 및 깊이감 부여 -->
-                <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                <img src="Gemini_Generated_Image_4fot0k4fot0k4fot.png" class="w-full h-auto object-cover opacity-90 transition hover:scale-105 duration-1000" alt="Banner">
+                <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
                 <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8">
@@ -134,7 +132,7 @@
             </div>
         </section>
 
-        <!-- Board Section (Integrated) -->
+        <!-- Board Section (Notice, Patch, Custom) -->
         <section id="page-board" class="page-section hidden fade-in max-w-5xl mx-auto">
             <div class="flex justify-between items-center mb-10">
                 <h2 id="board-title" class="text-4xl font-black text-gray-800 tracking-tighter">게시판</h2>
@@ -142,12 +140,8 @@
             </div>
             <div class="bg-white border border-gray-100 rounded-[2rem] shadow-xl overflow-hidden">
                 <table class="w-full text-left">
-                    <thead>
-                        <tr class="bg-gray-50/50 border-b border-gray-50 text-gray-400 text-[10px] font-black uppercase tracking-widest">
-                            <th class="p-8">제목</th>
-                            <th class="p-8 text-center w-40">날짜</th>
-                            <th class="admin-only hidden p-8 text-center w-24">관리</th>
-                        </tr>
+                    <thead class="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <tr><th class="p-8">제목</th><th class="p-8 text-center w-40">날짜</th><th class="admin-only hidden p-8 text-center w-24">관리</th></tr>
                     </thead>
                     <tbody id="board-list" class="divide-y divide-gray-50"></tbody>
                 </table>
@@ -183,17 +177,32 @@
             </div>
         </section>
 
-        <!-- Pet/Item Gallery Sections -->
+        <!-- Gallery Sections (Pet, Item, Ride, Calendar) -->
         <section id="page-pet" class="page-section hidden fade-in max-w-6xl mx-auto">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-4xl font-black text-gray-800">페트 도감</h2>
                 <button onclick="window.showDataModal('pet')" class="admin-only hidden bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-black shadow-lg transition">+ 페트 등록</button>
             </div>
-            <div class="mb-10 relative">
-                <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input type="text" id="pet-search" oninput="window.filterPets()" class="w-full pl-16 pr-6 py-5 bg-white border border-gray-100 rounded-3xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold" placeholder="페트 이름을 입력하세요...">
-            </div>
             <div id="pet-gallery" class="grid grid-cols-2 lg:grid-cols-4 gap-8"></div>
+        </section>
+
+        <section id="page-ride" class="page-section hidden fade-in max-w-6xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-4xl font-black text-gray-800">캐릭터 / 탑승</h2>
+            </div>
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="w-full lg:w-1/3 bg-white border border-gray-100 rounded-[2rem] shadow-xl p-8 h-[750px] flex flex-col">
+                    <div class="flex justify-between items-center mb-6 pb-4 border-b"><h3 class="font-black text-2xl text-gray-800">캐릭터</h3></div>
+                    <ul id="character-list" class="flex-grow overflow-y-auto space-y-3 pr-2 custom-scrollbar"></ul>
+                </div>
+                <div class="w-full lg:w-2/3 bg-white border border-gray-100 rounded-[2rem] shadow-xl p-8 h-[750px] flex flex-col">
+                    <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                        <h3 id="ride-title" class="font-black text-2xl text-blue-600">탑승 페트</h3>
+                        <button onclick="window.showDataModal('ride')" class="admin-only hidden bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-2xl font-black shadow-lg transition">+ 탑승 등록</button>
+                    </div>
+                    <div id="ride-pet-gallery" class="flex-grow overflow-y-auto grid grid-cols-2 md:grid-cols-3 gap-6 content-start pr-2 custom-scrollbar"></div>
+                </div>
+            </div>
         </section>
 
         <section id="page-item" class="page-section hidden fade-in max-w-6xl mx-auto">
@@ -204,30 +213,6 @@
             <div id="item-gallery" class="grid grid-cols-2 md:grid-cols-5 gap-6"></div>
         </section>
 
-        <!-- Ride Section -->
-        <section id="page-ride" class="page-section hidden fade-in max-w-6xl mx-auto">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-4xl font-black text-gray-800">캐릭터 / 탑승</h2>
-            </div>
-            <div class="flex flex-col lg:flex-row gap-8">
-                <div class="w-full lg:w-1/3 bg-white border border-gray-100 rounded-[2rem] shadow-xl p-8 h-[750px] flex flex-col">
-                    <div class="flex justify-between items-center mb-6 pb-4 border-b">
-                        <h3 class="font-black text-2xl text-gray-800">캐릭터 목록</h3>
-                        <button onclick="window.showDataModal('character')" class="admin-only hidden text-xs font-black text-blue-600 bg-blue-50 px-4 py-2 rounded-xl hover:bg-blue-100 transition">+ 추가</button>
-                    </div>
-                    <ul id="character-list" class="flex-grow overflow-y-auto space-y-3 pr-2 custom-scrollbar"></ul>
-                </div>
-                <div class="w-full lg:w-2/3 bg-white border border-gray-100 rounded-[2rem] shadow-xl p-8 h-[750px] flex flex-col">
-                    <div class="flex justify-between items-center mb-6 pb-4 border-b">
-                        <h3 id="ride-title" class="font-black text-2xl text-blue-600">탑승 가능한 페트</h3>
-                        <button onclick="window.showDataModal('ride')" class="admin-only hidden bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-2xl font-black shadow-lg transition">+ 탑승 등록</button>
-                    </div>
-                    <div id="ride-pet-gallery" class="flex-grow overflow-y-auto grid grid-cols-2 md:grid-cols-3 gap-6 content-start pr-2 custom-scrollbar"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Calendar Section -->
         <section id="page-calendar" class="page-section hidden fade-in max-w-5xl mx-auto">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-4xl font-black text-gray-800">캘린더</h2>
@@ -267,23 +252,19 @@
             </div>
             <div class="p-10 overflow-y-auto flex-grow bg-white">
                 <div class="mb-8">
-                    <label class="block text-xs font-black text-gray-400 mb-2 uppercase ml-1">제목</label>
+                    <label class="block text-xs font-black text-gray-400 mb-2 ml-1">제목</label>
                     <input type="text" id="write-title" class="w-full px-8 py-5 border border-gray-100 rounded-3xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 text-xl font-black transition">
                 </div>
-                <div class="mb-2">
-                    <label class="block text-xs font-black text-gray-400 mb-2 uppercase ml-1">내용 (이미지 첨부 가능)</label>
-                    <div class="border border-gray-100 rounded-[2rem] overflow-hidden">
-                        <div class="bg-gray-50/50 p-4 border-b border-gray-50 flex flex-wrap gap-2 items-center">
-                            <button onclick="document.execCommand('bold')" class="w-12 h-12 hover:bg-gray-200 rounded-2xl text-gray-600"><i class="fas fa-bold"></i></button>
-                            <button onclick="document.execCommand('italic')" class="w-12 h-12 hover:bg-gray-200 rounded-2xl text-gray-600"><i class="fas fa-italic"></i></button>
-                            <div class="w-px h-6 bg-gray-200 mx-2"></div>
-                            <label class="cursor-pointer w-12 h-12 hover:bg-blue-100 rounded-2xl text-blue-600 flex items-center justify-center font-black">
-                                <i class="fas fa-image text-2xl"></i>
-                                <input type="file" class="hidden" accept="image/*" onchange="window.handleEditorImageUpload(event)">
-                            </label>
-                        </div>
-                        <div id="write-content" onmouseup="window.saveEditorSelection()" onkeyup="window.saveEditorSelection()" class="w-full h-[450px] p-8 focus:outline-none overflow-y-auto whitespace-pre-wrap leading-relaxed custom-scrollbar font-medium" contenteditable="true" placeholder="내용을 작성하세요."></div>
+                <div class="border border-gray-100 rounded-[2rem] overflow-hidden">
+                    <div class="bg-gray-50/50 p-4 border-b flex gap-2">
+                        <button onclick="document.execCommand('bold')" class="w-12 h-12 hover:bg-gray-200 rounded-2xl"><i class="fas fa-bold"></i></button>
+                        <button onclick="document.execCommand('italic')" class="w-12 h-12 hover:bg-gray-200 rounded-2xl"><i class="fas fa-italic"></i></button>
+                        <label class="cursor-pointer w-12 h-12 hover:bg-blue-100 rounded-2xl text-blue-600 flex items-center justify-center">
+                            <i class="fas fa-image text-2xl"></i>
+                            <input type="file" class="hidden" accept="image/*" onchange="window.handleEditorImageUpload(event)">
+                        </label>
                     </div>
+                    <div id="write-content" onmouseup="window.saveEditorSelection()" onkeyup="window.saveEditorSelection()" class="w-full h-[450px] p-8 focus:outline-none overflow-y-auto font-medium" contenteditable="true" placeholder="내용을 작성하세요."></div>
                 </div>
             </div>
             <div class="p-8 border-t bg-gray-50/50 flex justify-end gap-4">
@@ -299,7 +280,7 @@
                 <div><h3 id="view-modal-title" class="text-3xl font-black text-gray-800 mb-1">제목</h3><p id="view-modal-date" class="text-sm font-black text-blue-600">날짜</p></div>
                 <button onclick="window.closeModal('view-modal')" class="text-gray-300 hover:text-gray-600 transition"><i class="fas fa-times text-2xl"></i></button>
             </div>
-            <div id="view-modal-content" class="p-10 overflow-y-auto flex-grow text-gray-800 leading-relaxed whitespace-pre-wrap font-medium"></div>
+            <div id="view-modal-content" class="p-10 overflow-y-auto flex-grow text-gray-800 leading-relaxed font-medium"></div>
         </div>
     </div>
 
@@ -310,27 +291,21 @@
             <p id="confirm-msg" class="text-gray-400 font-bold mb-10 leading-relaxed"></p>
             <div class="flex gap-4">
                 <button onclick="window.closeModal('confirm-modal')" class="flex-1 px-4 py-4 rounded-2xl font-black text-gray-500 bg-gray-100 hover:bg-gray-200 transition">아니오</button>
-                <button onclick="window.executeConfirm()" id="confirm-btn" class="flex-1 px-4 py-4 rounded-2xl font-black text-white shadow-xl transition transform active:scale-95">예</button>
+                <button onclick="window.executeConfirm()" id="confirm-btn" class="flex-1 px-4 py-4 rounded-2xl font-black text-white shadow-xl">예</button>
             </div>
         </div>
     </div>
 
     <div id="admin-modal" class="fixed inset-0 bg-black/60 hidden justify-center items-center z-[200] p-4 backdrop-blur-sm">
         <div class="bg-white rounded-[2rem] w-full max-w-md shadow-2xl overflow-hidden fade-in">
-            <div class="p-8 border-b flex justify-between items-center bg-gray-50/50">
-                <h3 class="text-2xl font-black text-gray-800"><i class="fas fa-crown text-brand-gold mr-3"></i>게시판 관리</h3>
-                <button onclick="window.closeModal('admin-modal')" class="text-gray-300 hover:text-gray-600 transition"><i class="fas fa-times text-xl"></i></button>
-            </div>
+            <div class="p-8 border-b flex justify-between items-center bg-gray-50/50"><h3 class="text-2xl font-black text-gray-800">게시판 관리</h3><button onclick="window.closeModal('admin-modal')" class="text-gray-300"><i class="fas fa-times"></i></button></div>
             <div class="p-8">
-                <div class="mb-10 bg-blue-50/50 p-6 rounded-[1.5rem] border border-blue-100">
-                    <h4 class="font-black text-sm text-blue-800 mb-4 ml-1">새 게시판 추가</h4>
-                    <div class="space-y-3">
-                        <input type="text" id="new-cat-name" class="w-full px-5 py-3.5 border border-gray-100 rounded-2xl outline-none font-bold" placeholder="이름 (예: 퀘스트)">
-                        <input type="text" id="new-cat-id" class="w-full px-5 py-3.5 border border-gray-100 rounded-2xl outline-none font-bold" placeholder="영문 ID (예: quest)">
-                        <button onclick="window.addCategory()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black shadow-lg transition">추가하기</button>
-                    </div>
+                <div class="mb-10 space-y-3 bg-blue-50/50 p-6 rounded-[1.5rem]">
+                    <input type="text" id="new-cat-name" class="w-full p-4 rounded-2xl outline-none font-bold" placeholder="게시판 이름">
+                    <input type="text" id="new-cat-id" class="w-full p-4 rounded-2xl outline-none font-bold" placeholder="영문 ID">
+                    <button onclick="window.addCategory()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black">게시판 추가</button>
                 </div>
-                <div><h4 class="font-black text-sm text-gray-400 mb-4 ml-1 uppercase tracking-widest">현재 목록</h4><ul id="admin-cat-list" class="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar"></ul></div>
+                <ul id="admin-cat-list" class="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar"></ul>
             </div>
         </div>
     </div>
@@ -339,41 +314,44 @@
 
     <footer class="bg-white border-t border-gray-50 py-10">
         <div class="container mx-auto px-4 text-center">
-            <p class="text-[10px] font-black text-gray-300 tracking-widest uppercase">© 2026 STONEAGE SKY. All rights reserved.</p>
+            <p class="text-[10px] font-black text-gray-300 uppercase">© 2026 STONEAGE SKY. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- 모든 처리 함수를 최상단에 미리 정의 (TypeError 방지) -->
+    <!-- All Logic Functions (Global Window Binding) -->
     <script>
         window.allPets = []; window.allCharacters = []; window.allRidePets = []; window.allItems = []; window.allExchanges = []; window.allCategories = [];
         window.currentBoard = ''; window.editingId = null; window.tempImageData = {}; window.unsubs = {}; window.currentExchangeTab = '구매';
         window.isAdmin = false; window.savedEditorRange = null; window.selectedCharIdForRide = null;
 
-        window.showToast = function(msg, isError = false) {
-            const t = document.createElement('div');
-            t.className = `fixed bottom-10 left-1/2 -translate-x-1/2 px-10 py-5 rounded-full shadow-2xl font-black z-[12000] fade-in text-white ${isError ? 'bg-red-600' : 'bg-gray-800'}`;
+        window.showToast = (msg, isE = false) => {
+            const t = document.createElement('div'); t.className = `fixed bottom-10 left-1/2 -translate-x-1/2 px-10 py-5 rounded-full shadow-2xl font-black z-[12000] fade-in text-white ${isE?'bg-red-600':'bg-gray-800'}`;
             t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2500);
         };
-        window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); };
-        window.openLightbox = function(src) { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'flex'; };
-        window.closeLightbox = function(e) { if(e.target.id !== 'lightbox-img') document.getElementById('lightbox').style.display = 'none'; };
+        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+        window.openLightbox = (src) => { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'flex'; };
+        window.closeLightbox = (e) => { if(e.target.id !== 'lightbox-img') document.getElementById('lightbox').style.display = 'none'; };
 
-        window.updateAdminUI = function() {
+        window.updateAdminUI = () => {
             document.querySelectorAll('.admin-only').forEach(el => window.isAdmin ? el.classList.remove('hidden') : el.classList.add('hidden'));
             const adminBtn = document.getElementById('admin-setting-btn');
             if(adminBtn && window.isAdmin) adminBtn.classList.remove('hidden');
         };
 
-        window.filterPets = function() {
-            const term = document.getElementById('pet-search')?.value.toLowerCase() || '';
+        const drawAttrBar = (v, c) => {
+            let b = ''; for(let i=0; i<10; i++) b += `<div class="w-full h-1.5 rounded-sm ${i<v?c:'bg-gray-800'}"></div>`;
+            return `<div class="flex gap-[2px] w-full px-1">${b}</div>`;
+        };
+
+        window.filterPets = () => {
             const gal = document.getElementById('pet-gallery'); if(!gal) return;
-            gal.innerHTML = window.allPets.filter(p => p.name.toLowerCase().includes(term)).map(p => `
-                <div class="bg-gray-900 rounded-[2rem] overflow-hidden shadow-2xl text-white relative group border border-gray-800 flex flex-col h-full">
+            gal.innerHTML = window.allPets.map(p => `
+                <div class="bg-gray-900 rounded-[2rem] overflow-hidden shadow-2xl text-white relative flex flex-col h-full">
                     <div class="admin-only ${window.isAdmin?'':'hidden'} absolute top-4 right-4 z-10 flex gap-2">
-                        <button onclick="window.showDataModal('pet', '${p.id}')" class="bg-black/50 hover:bg-blue-600 p-2.5 rounded-xl text-white transition"><i class="fas fa-edit text-xs"></i></button>
-                        <button onclick="window.deleteData('pet', '${p.id}')" class="bg-black/50 hover:bg-red-600 p-2.5 rounded-xl text-white transition"><i class="fas fa-trash text-xs"></i></button>
+                        <button onclick="window.showDataModal('pet', '${p.id}')" class="bg-black/50 p-2.5 rounded-xl"><i class="fas fa-edit text-xs"></i></button>
+                        <button onclick="window.deleteData('pet', '${p.id}')" class="bg-black/50 p-2.5 rounded-xl"><i class="fas fa-trash text-xs"></i></button>
                     </div>
-                    <div class="h-48 bg-gray-800/50 flex justify-center items-center p-6"><img src="${p.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition duration-500" onclick="window.openLightbox(this.src)"></div>
+                    <div class="h-48 flex justify-center items-center p-6"><img src="${p.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition" onclick="window.openLightbox(this.src)"></div>
                     <div class="p-6 flex-grow flex flex-col">
                         <h4 class="font-black text-xl mb-3 text-center truncate">${p.name}</h4>
                         <div class="space-y-2 mb-5">
@@ -382,24 +360,76 @@
                             <div class="flex items-center"><span class="w-7 text-[10px] font-black text-red-500">火</span>${drawAttrBar(p.attr_f,'bg-red-500')}</div>
                             <div class="flex items-center"><span class="w-7 text-[10px] font-black text-green-500">風</span>${drawAttrBar(p.attr_wi,'bg-green-500')}</div>
                         </div>
-                        <div class="mt-auto flex justify-between items-center border border-gray-700 rounded-2xl bg-gray-800/80 p-4">
-                            <span class="text-[10px] text-gray-500 font-black uppercase tracking-widest">Growth</span>
-                            <span class="font-black text-brand-gold text-xl tracking-tighter">${p.total||'-'}</span>
-                        </div>
+                        <div class="mt-auto border border-gray-700 rounded-2xl bg-gray-800 p-4 flex justify-between items-center"><span class="text-[10px] text-gray-500 font-black">Growth</span><span class="font-black text-brand-gold text-xl">${p.total||'-'}</span></div>
                     </div>
                 </div>`).join('');
             window.updateAdminUI();
         };
 
-        const drawAttrBar = (val, color) => {
-            let b = ''; for(let i=0; i<10; i++) b += `<div class="w-full h-1.5 rounded-sm ${i < val ? color : 'bg-gray-800'}"></div>`;
-            return `<div class="flex gap-[2px] w-full px-1">${b}</div>`;
+        window.filterCharacters = () => {
+            const list = document.getElementById('character-list'); if(!list) return;
+            list.innerHTML = window.allCharacters.map(c => `
+                <li onclick="window.selectCharForRide('${c.id}', '${c.name}')" class="flex justify-between items-center p-4 border rounded-2xl cursor-pointer transition ${window.selectedCharIdForRide===c.id?'bg-blue-50 border-blue-400 text-blue-700 font-black':'bg-white'}">
+                    <span>${c.name}</span>
+                    <button onclick="window.deleteData('character','${c.id}'); event.stopPropagation();" class="admin-only ${window.isAdmin?'':'hidden'} text-red-400 p-1"><i class="fas fa-trash text-xs"></i></button>
+                </li>`).join('');
+            window.updateAdminUI();
+        };
+
+        window.selectCharForRide = (id, n) => {
+            window.selectedCharIdForRide = (window.selectedCharIdForRide === id ? null : id);
+            document.getElementById('ride-title').textContent = window.selectedCharIdForRide ? `[${n}] 탑승 페트` : '탑승 페트';
+            window.filterCharacters(); window.filterRidePets();
+        };
+
+        window.filterRidePets = () => {
+            const gal = document.getElementById('ride-pet-gallery'); if(!gal) return;
+            const filtered = window.allRidePets.filter(p => window.selectedCharIdForRide ? (p.chars||[]).includes(window.selectedCharIdForRide) : true);
+            gal.innerHTML = filtered.map(p => `
+                <div class="bg-white border border-gray-100 rounded-[1.5rem] overflow-hidden shadow-sm relative group">
+                    <div class="admin-only ${window.isAdmin?'':'hidden'} absolute top-2 right-2 z-10 flex gap-2">
+                        <button onclick="window.showDataModal('ride', '${p.id}')" class="bg-white/90 text-blue-500 p-2 rounded-xl shadow-sm"><i class="fas fa-edit text-xs"></i></button>
+                        <button onclick="window.deleteData('ride', '${p.id}')" class="bg-white/90 text-red-500 p-2 rounded-xl shadow-sm"><i class="fas fa-trash text-xs"></i></button>
+                    </div>
+                    <div class="h-36 bg-gray-50/50 flex items-center justify-center p-6"><img src="${p.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition" onclick="window.openLightbox(this.src)"></div>
+                    <div class="p-4 text-center font-black text-gray-800 truncate">${p.name}</div>
+                </div>`).join('') || `<div class="col-span-full text-center text-gray-300 py-24 font-black">데이터가 없습니다.</div>`;
+            window.updateAdminUI();
+        };
+
+        window.filterItems = () => {
+            const gal = document.getElementById('item-gallery'); if(!gal) return;
+            gal.innerHTML = window.allItems.map(i => `
+                <div class="bg-white border border-gray-100 rounded-[1.5rem] shadow-sm overflow-hidden relative">
+                    <div class="admin-only ${window.isAdmin?'':'hidden'} absolute top-2 right-2 z-10 flex gap-2">
+                        <button onclick="window.showDataModal('items', '${i.id}')" class="bg-white/90 text-blue-500 p-2 rounded-xl"><i class="fas fa-edit text-xs"></i></button>
+                        <button onclick="window.deleteData('items', '${i.id}')" class="bg-white/90 text-red-500 p-2 rounded-xl"><i class="fas fa-trash text-xs"></i></button>
+                    </div>
+                    <div class="h-36 bg-gray-50/50 flex items-center justify-center p-6"><img src="${i.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition" onclick="window.openLightbox(this.src)"></div>
+                    <div class="p-5 font-black text-sm text-center truncate">${i.name}</div>
+                </div>`).join('');
+            window.updateAdminUI();
+        };
+
+        window.switchExchangeTab = (tab) => {
+            window.currentExchangeTab = tab;
+            ['tab-buy', 'tab-sell', 'tab-instant'].forEach(id => document.getElementById(id).classList.remove('text-blue-600', 'border-blue-600', 'bg-blue-50/50'));
+            const activeId = {'구매':'tab-buy','판매':'tab-sell','즉시구매':'tab-instant'}[tab];
+            document.getElementById(activeId).classList.add('text-blue-600', 'border-blue-600', 'bg-blue-50/50');
+            
+            const tbody = document.getElementById('exchange-list');
+            const color = {'구매':'bg-blue-100 text-blue-700', '판매':'bg-red-100 text-red-700', '즉시구매':'bg-yellow-100 text-yellow-700'}[tab];
+            
+            tbody.innerHTML = window.allExchanges.filter(e => e.type === tab).map(item => {
+                const canM = window.isAdmin || (window.currentUser && item.uid === window.currentUser.uid);
+                return `<tr class="hover:bg-gray-50 border-b border-gray-50 transition"><td class="p-6 text-center"><span class="px-3 py-1.5 rounded-xl text-[10px] font-black ${color}">${item.type}</span></td><td class="p-6 text-center">${item.image?`<img src="${item.image}" class="w-14 h-14 object-cover rounded-[1.2rem] cursor-pointer mx-auto shadow-md" onclick="window.openLightbox(this.src)">`:'-'}</td><td class="p-6 font-black text-gray-800">${item.name}</td><td class="p-6 text-sm text-gray-400 font-bold truncate max-w-xs">${item.desc}</td><td class="p-6 text-center font-black text-brand-gold text-lg">${item.price} VIP</td><td class="p-6 text-center text-sm font-black text-[#5865F2]"><i class="fab fa-discord mr-1"></i>${item.dc}</td><td class="p-6 text-center">${canM ? `<button onclick="window.showDataModal('exchange', '${item.id}')" class="text-blue-500 p-3"><i class="fas fa-edit"></i></button><button onclick="window.deleteData('exchange', '${item.id}')" class="text-red-500 p-3"><i class="fas fa-trash"></i></button>` : '-'}</td></tr>`;
+            }).join('') || `<tr><td colspan="7" class="text-center p-24 text-gray-300 font-black">거래 내역이 없습니다.</td></tr>`;
         };
     </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, getDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -415,193 +445,127 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Bind for Global Access
+        // [세션 유지 설정] 탭/브라우저를 닫으면 로그아웃됨
+        setPersistence(auth, browserSessionPersistence).catch(e => console.error(e));
+
         window.auth = auth; window.db = db;
         window.signInWithEmailAndPassword = signInWithEmailAndPassword; window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
         window.signOut = signOut; window.collection = collection; window.addDoc = addDoc; window.setDoc = setDoc;
         window.doc = doc; window.getDoc = getDoc; window.updateDoc = updateDoc; window.deleteDoc = deleteDoc;
         window.query = query; window.orderBy = orderBy; window.onSnapshot = onSnapshot;
 
-        // 안정적인 초기 로딩 로직
-        let loginChecked = false;
-        const hideLoader = () => {
-            const loader = document.getElementById('initial-loader');
-            if(loader) loader.classList.add('hidden');
-        };
+        const hLoader = () => { const l = document.getElementById('initial-loader'); if(l) l.classList.add('hidden'); };
+        setTimeout(hLoader, 4000); // 4초 비상 타임아웃
 
-        // 5초 후에도 로딩이 안 풀리면 강제 해제 (비상구)
-        setTimeout(hideLoader, 5000);
+        onAuthStateChanged(auth, (u) => {
+            const ov = document.getElementById('auth-overlay');
+            const ua = document.getElementById('user-info-area');
+            const ui = document.getElementById('user-info');
 
-        onAuthStateChanged(auth, (user) => {
-            loginChecked = true;
-            const overlay = document.getElementById('auth-overlay');
-            const userArea = document.getElementById('user-info-area');
-            const userInfo = document.getElementById('user-info');
-
-            if (user) {
-                window.currentUser = user;
-                window.isAdmin = (user.email === 'milk@stoneage.sky');
-                if(overlay) overlay.classList.add('hidden');
-                if(userArea) userArea.classList.remove('hidden');
-                if(userInfo) userInfo.innerHTML = window.isAdmin ? '👑 관리자' : (user.email.split('@')[0] + ' 님');
-                
-                // 순서 보장: 유저 확인 후 리스너 시작
+            if (u) {
+                window.currentUser = u;
+                window.isAdmin = (u.email === 'milk@stoneage.sky');
+                if(ov) ov.classList.add('hidden');
+                if(ua) ua.classList.remove('hidden');
+                if(ui) ui.innerHTML = window.isAdmin ? '👑 관리자' : (u.email.split('@')[0] + ' 님');
                 initRealtimeListeners();
                 window.showPage('home');
             } else {
                 window.currentUser = null; window.isAdmin = false;
-                if(overlay) overlay.classList.remove('hidden');
-                if(userArea) userArea.classList.add('hidden');
+                if(ov) ov.classList.remove('hidden');
+                if(ua) ua.classList.add('hidden');
             }
-            hideLoader();
+            hLoader();
         });
 
         function initRealtimeListeners() {
-            const safeListen = (col, order, cb) => {
-                if (window.unsubs[col]) return;
+            const safeL = (c, o, cb) => {
+                if(window.unsubs[c]) return;
                 try {
-                    const q = window.query(window.collection(window.db, col), window.orderBy(order, "desc"));
-                    window.unsubs[col] = window.onSnapshot(q, snap => {
-                        const list = []; snap.forEach(d => list.push({id: d.id, ...d.data()}));
-                        cb(list);
-                    }, err => console.log(col + " 권한 없음"));
-                } catch(e) { console.log(e); }
+                    const q = window.query(window.collection(window.db, c), window.orderBy(o, "desc"));
+                    window.unsubs[c] = window.onSnapshot(q, s => {
+                        const l = []; s.forEach(d => l.push({id: d.id, ...d.data()}));
+                        cb(l);
+                    }, e => console.log(c + " 권한 없음"));
+                } catch(e) {}
             };
 
-            safeListen("notice", "createdAt", data => { window.noticeData = data; if(window.currentBoard==='notice') window.renderBoard(); window.renderHome(); });
-            safeListen("patch", "createdAt", data => { window.patchData = data; if(window.currentBoard==='patch') window.renderBoard(); window.renderHome(); });
-            safeListen("calendar", "startDate", data => { window.allCalendars = data; window.renderCalendar(); window.renderHome(); });
-            safeListen("pet", "createdAt", data => { window.allPets = data; window.filterPets(); });
-            safeListen("character", "name", data => { window.allCharacters = data; window.filterCharacters(); });
-            safeListen("ride", "createdAt", data => { window.allRidePets = data; window.filterRidePets(); });
-            safeListen("items", "createdAt", data => { window.allItems = data; window.filterItems(); });
-            safeListen("exchange", "createdAt", data => {
+            safeL("notice", "createdAt", d => { window.noticeData = d; if(window.currentBoard==='notice') window.renderBoard(); window.renderHome(); });
+            safeL("patch", "createdAt", d => { window.patchData = d; if(window.currentBoard==='patch') window.renderBoard(); window.renderHome(); });
+            safeL("calendar", "startDate", d => { window.allCalendars = d; window.renderCalendar(); window.renderHome(); });
+            safeL("pet", "createdAt", d => { window.allPets = d; window.filterPets(); });
+            safeL("character", "name", d => { window.allCharacters = d; window.filterCharacters(); });
+            safeL("ride", "createdAt", d => { window.allRidePets = d; window.filterRidePets(); });
+            safeL("items", "createdAt", d => { window.allItems = d; window.filterItems(); });
+            safeL("exchange", "createdAt", d => {
                 const now = Date.now();
-                window.allExchanges = data.filter(e => {
+                window.allExchanges = d.filter(e => {
                     if (now - e.createdAt > 14 * 24 * 60 * 60 * 1000) { window.deleteDoc(window.doc(window.db, "exchange", e.id)).catch(()=>{}); return false; }
                     return true;
                 });
                 window.switchExchangeTab(window.currentExchangeTab);
             });
-            safeListen("categories", "createdAt", data => {
-                window.allCategories = data;
+            safeL("categories", "createdAt", d => {
+                window.allCategories = d;
                 const container = document.getElementById('dynamic-nav-container');
-                if(container) container.innerHTML = data.map(c => `<a href="#" onclick="window.showPage('${c.id}')" class="nav-btn px-4 py-2 rounded-xl hover:bg-gray-100 transition" data-target="${c.id}">${c.name}</a>`).join('');
-                data.forEach(c => {
-                    if(!window.unsubs[c.id]) safeListen(c.id, "createdAt", d => { window['data_'+c.id] = d; if(window.currentBoard===c.id) window.renderBoard(); });
+                if(container) container.innerHTML = d.map(c => `<a href="#" onclick="window.showPage('${c.id}')" class="nav-btn px-4 py-2 rounded-xl hover:bg-gray-100 transition" data-target="${c.id}">${c.name}</a>`).join('');
+                d.forEach(c => {
+                    if(!window.unsubs[c.id]) safeL(c.id, "createdAt", d => { window['data_'+c.id] = d; if(window.currentBoard===c.id) window.renderBoard(); });
                 });
             });
         }
     </script>
 
-    <!-- Page Logic Script (Global window functions) -->
     <script>
-        window.toggleAuthMode = function() {
-            window.authMode = (window.authMode === 'login' ? 'signup' : 'login');
-            document.getElementById('auth-title').textContent = (window.authMode === 'login' ? '로그인' : '회원가입');
-            document.getElementById('auth-btn').textContent = (window.authMode === 'login' ? '입장하기' : '가입하기');
-        };
-
-        window.handleAuthSubmit = async function() {
-            const id = document.getElementById('auth-id').value.trim();
-            const pw = document.getElementById('auth-pw').value;
+        window.toggleAuthMode = () => { window.authMode = (window.authMode==='login'?'signup':'login'); document.getElementById('auth-title').textContent = (window.authMode==='login'?'로그인':'회원가입'); document.getElementById('auth-btn').textContent = (window.authMode==='login'?'입장하기':'가입하기'); };
+        window.handleAuthSubmit = async () => {
+            const id = document.getElementById('auth-id').value.trim(); const pw = document.getElementById('auth-pw').value;
             if(!id || !pw) return window.showToast('아이디와 비밀번호를 입력하세요.', true);
-            const email = (id === 'milk' ? 'milk@stoneage.sky' : `${id}@stoneage.sky`);
+            const e = (id==='milk'?'milk@stoneage.sky':`${id}@stoneage.sky`);
             try {
-                if(window.authMode === 'signup') {
-                    if(id === 'milk') return window.showToast('금지된 아이디입니다.', true);
-                    await window.createUserWithEmailAndPassword(window.auth, email, pw);
-                } else {
-                    await window.signInWithEmailAndPassword(window.auth, email, pw);
-                }
-            } catch(e) { window.showToast('정보를 확인해주세요.', true); }
+                if(window.authMode==='signup') { if(id==='milk') return window.showToast('금지된 아이디', true); await window.createUserWithEmailAndPassword(window.auth, e, pw); }
+                else { await window.signInWithEmailAndPassword(window.auth, e, pw); }
+            } catch(e) { window.showToast('정보가 올바르지 않습니다.', true); }
         };
-
-        window.handleLogout = function() {
-            window.showCustomConfirm('로그아웃', '정말 접속을 종료하시겠습니까?', false, async () => {
-                await window.signOut(window.auth); window.location.reload();
-            });
-        };
-
-        window.showPage = function(pId) {
+        window.handleLogout = () => window.showCustomConfirm('로그아웃', '접속을 종료하시겠습니까?', false, async () => { await window.signOut(window.auth); window.location.reload(); });
+        window.showPage = (id) => {
             document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('bg-blue-50', 'text-blue-600', 'ring-1', 'ring-blue-100'));
-            
-            const isDyn = window.allCategories.find(c => c.id === pId);
-            if(['notice', 'patch'].includes(pId) || isDyn) {
-                window.currentBoard = pId;
-                document.getElementById('board-title').textContent = (pId==='notice'?'공지사항':(pId==='patch'?'패치노트':isDyn.name));
-                document.getElementById('page-board').classList.remove('hidden');
-                window.renderBoard();
-            } else {
-                document.getElementById('page-' + pId)?.classList.remove('hidden');
-            }
-            document.querySelector(`.nav-btn[data-target="${pId}"]`)?.classList.add('bg-blue-50', 'text-blue-600', 'ring-1', 'ring-blue-100');
+            const isD = window.allCategories.find(c => c.id === id);
+            if(['notice', 'patch'].includes(id) || isD) { window.currentBoard = id; document.getElementById('board-title').textContent = (id==='notice'?'공지사항':(id==='patch'?'패치노트':isD.name)); document.getElementById('page-board').classList.remove('hidden'); window.renderBoard(); }
+            else { document.getElementById('page-' + id)?.classList.remove('hidden'); }
+            document.querySelector(`.nav-btn[data-target="${id}"]`)?.classList.add('bg-blue-50', 'text-blue-600', 'ring-1', 'ring-blue-100');
             window.updateAdminUI();
         };
-
-        window.renderHome = function() {
+        window.renderHome = () => {
             const draw = (id, data, col) => {
                 const el = document.getElementById(id); if(!el) return;
-                el.innerHTML = (data||[]).slice(0, 5).map(item => `
-                    <li onclick="window.viewBoardPost('${col}','${item.id}')" class="flex justify-between items-center p-1 cursor-pointer hover:translate-x-1 transition group">
-                        <span class="truncate font-bold text-gray-700 group-hover:text-blue-600 transition">${item.title}</span>
-                        <span class="text-[10px] font-black text-gray-300">${new Date(item.createdAt).toLocaleDateString()}</span>
-                    </li>`).join('') || '<li class="text-xs text-gray-300 text-center py-4">최근 소식이 없습니다.</li>';
+                el.innerHTML = (data||[]).slice(0, 5).map(i => `<li onclick="window.viewBoardPost('${col}','${i.id}')" class="flex justify-between items-center p-1 cursor-pointer hover:translate-x-1 transition font-bold text-gray-700"><span>${i.title}</span><span class="text-[10px] text-gray-300 font-black">${new Date(i.createdAt).toLocaleDateString()}</span></li>`).join('') || '<li class="text-xs text-gray-300 py-4 text-center">소식이 없습니다.</li>';
             };
             draw('home-notice-list', window.noticeData, 'notice');
             draw('home-patch-list', window.patchData, 'patch');
             const cal = document.getElementById('home-calendar-list');
-            if(cal) cal.innerHTML = (window.allCalendars||[]).slice(0, 5).map(item => `
-                <li onclick="window.viewBoardPost('calendar','${item.id}')" class="bg-purple-50/50 p-3 rounded-2xl text-purple-800 cursor-pointer hover:bg-purple-100 transition">
-                    <p class="font-black text-xs truncate">${item.title}</p>
-                    <p class="text-[10px] font-bold opacity-60">${item.startDate.substring(5)} ~ ${item.endDate.substring(5)}</p>
-                </li>`).join('') || '<li class="text-xs text-gray-300 text-center py-4">예정된 일정이 없습니다.</li>';
+            if(cal) cal.innerHTML = (window.allCalendars||[]).slice(0, 5).map(i => `<li onclick="window.viewBoardPost('calendar','${i.id}')" class="bg-purple-50 p-3 rounded-2xl text-purple-800 cursor-pointer font-black text-xs hover:bg-purple-100 transition"><p>${i.title}</p><p class="opacity-60 text-[10px]">${i.startDate.substring(5)} ~ ${i.endDate.substring(5)}</p></li>`).join('') || '<li class="text-xs text-gray-300 py-4 text-center">일정이 없습니다.</li>';
         };
-
-        window.renderBoard = function() {
+        window.renderBoard = () => {
             const tbody = document.getElementById('board-list'); if(!tbody) return;
-            let d = [];
-            if(window.currentBoard === 'notice') d = window.noticeData;
-            else if(window.currentBoard === 'patch') d = window.patchData;
-            else d = window['data_' + window.currentBoard] || [];
-            
-            tbody.innerHTML = (d||[]).map(item => `
-                <tr onclick="window.viewBoardPost('${window.currentBoard}', '${item.id}')" class="hover:bg-gray-50 transition cursor-pointer">
-                    <td class="p-8 font-black text-gray-800">${item.title}</td>
-                    <td class="p-8 text-center text-[10px] font-black text-gray-400">${new Date(item.createdAt).toLocaleDateString()}</td>
-                    <td class="admin-only ${window.isAdmin?'':'hidden'} p-8 text-center" onclick="event.stopPropagation()">
-                        <button onclick="window.showWriteModal('${item.id}')" class="text-gray-300 hover:text-blue-600 p-2"><i class="fas fa-edit"></i></button>
-                        <button onclick="window.deleteData('${window.currentBoard}', '${item.id}')" class="text-gray-300 hover:text-red-600 p-2"><i class="fas fa-trash"></i></button>
-                    </td></tr>`).join('') || '<tr><td colspan="3" class="p-20 text-center text-gray-300 font-black">등록된 글이 없습니다.</td></tr>';
+            let d = (window.currentBoard==='notice'?window.noticeData:(window.currentBoard==='patch'?window.patchData:window['data_'+window.currentBoard]||[]));
+            tbody.innerHTML = (d||[]).map(i => `<tr onclick="window.viewBoardPost('${window.currentBoard}', '${i.id}')" class="hover:bg-gray-50 transition cursor-pointer font-black text-gray-800"><td class="p-8">${i.title}</td><td class="p-8 text-center text-[10px] text-gray-400">${new Date(i.createdAt).toLocaleDateString()}</td><td class="admin-only ${window.isAdmin?'':'hidden'} p-8 text-center" onclick="event.stopPropagation()"><button onclick="window.showWriteModal('${i.id}')" class="p-2"><i class="fas fa-edit"></i></button><button onclick="window.deleteData('${window.currentBoard}', '${i.id}')" class="p-2 text-red-400"><i class="fas fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="p-20 text-center text-gray-300 font-black">글이 없습니다.</td></tr>';
             window.updateAdminUI();
         };
-
-        window.renderCalendar = function() {
+        window.renderCalendar = () => {
             const tbody = document.getElementById('calendar-list'); if(!tbody) return;
-            tbody.innerHTML = (window.allCalendars||[]).map(item => `
-                <tr onclick="window.viewBoardPost('calendar', '${item.id}')" class="hover:bg-gray-50 transition cursor-pointer">
-                    <td class="p-8 font-black text-gray-800">${item.title}</td>
-                    <td class="p-8 text-center text-sm font-black text-gray-400">${item.startDate} ~ ${item.endDate}</td>
-                    <td class="admin-only ${window.isAdmin?'':'hidden'} p-8 text-center" onclick="event.stopPropagation()">
-                        <button onclick="window.showDataModal('calendar', '${item.id}')" class="text-gray-300 hover:text-blue-600 p-2"><i class="fas fa-edit"></i></button>
-                        <button onclick="window.deleteData('calendar', '${item.id}')" class="text-gray-300 hover:text-red-600 p-2"><i class="fas fa-trash"></i></button>
-                    </td></tr>`).join('') || '<tr><td colspan="3" class="p-20 text-center text-gray-300 font-black">일정이 없습니다.</td></tr>';
+            tbody.innerHTML = (window.allCalendars||[]).map(i => `<tr onclick="window.viewBoardPost('calendar', '${i.id}')" class="hover:bg-gray-50 transition cursor-pointer font-black text-gray-800"><td class="p-8">${i.title}</td><td class="p-8 text-center text-sm text-gray-400">${i.startDate} ~ ${i.endDate}</td><td class="admin-only ${window.isAdmin?'':'hidden'} p-8 text-center" onclick="event.stopPropagation()"><button onclick="window.showDataModal('calendar', '${i.id}')" class="p-2"><i class="fas fa-edit"></i></button><button onclick="window.deleteData('calendar', '${i.id}')" class="p-2 text-red-400"><i class="fas fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="3" class="p-20 text-center text-gray-300 font-black">일정이 없습니다.</td></tr>';
             window.updateAdminUI();
         };
-
-        window.saveEditorSelection = function() {
-            const s = window.getSelection(); if (s.rangeCount > 0) window.savedEditorRange = s.getRangeAt(0);
-        };
-
-        window.handleEditorImageUpload = async function(e) {
+        window.saveEditorSelection = () => { const s = window.getSelection(); if (s.rangeCount > 0) window.savedEditorRange = s.getRangeAt(0); };
+        window.handleEditorImageUpload = async (e) => {
             const f = e.target.files[0]; if(!f) return;
-            const b64 = await compressImg(f, 800, 0.8);
+            const b = await compressImg(f, 800, 0.8);
             const ed = document.getElementById('write-content'); ed.focus();
             if(window.savedEditorRange) { const s = window.getSelection(); s.removeAllRanges(); s.addRange(window.savedEditorRange); }
-            document.execCommand('insertHTML', false, `<img src="${b64}" class="max-w-full rounded-[1.5rem] shadow-lg my-6">`);
+            document.execCommand('insertHTML', false, `<img src="${b}" class="max-w-full rounded-[1.5rem] shadow-lg my-6">`);
         };
-
         async function compressImg(f, mw, q) {
             return new Promise(res => {
                 const r = new FileReader(); r.onload = e => {
@@ -613,162 +577,72 @@
                 }; r.readAsDataURL(f);
             });
         }
-
-        window.saveBoardPost = async function() {
-            const title = document.getElementById('write-title').value.trim();
-            const content = document.getElementById('write-content').innerHTML;
-            if(!title) return window.showToast('제목을 입력하세요.', true);
-            const data = { title, content };
-            try {
-                if(window.editingId) await window.updateDoc(window.doc(window.db, window.currentBoard, window.editingId), data);
-                else { data.createdAt = Date.now(); await window.addDoc(window.collection(window.db, window.currentBoard), data); }
-                window.showToast('저장 완료'); window.closeModal('write-modal');
-            } catch(e) { window.showToast('저장 실패', true); }
-        };
-
-        window.showWriteModal = async function(id = null) {
+        window.showWriteModal = async (id = null) => {
             window.editingId = id; document.getElementById('write-title').value = ''; document.getElementById('write-content').innerHTML = '';
-            if(id) {
-                const snap = await window.getDoc(window.doc(window.db, window.currentBoard, id));
-                if(snap.exists()) { document.getElementById('write-title').value = snap.data().title; document.getElementById('write-content').innerHTML = snap.data().content; }
-            }
+            if(id) { const snap = await window.getDoc(window.doc(window.db, window.currentBoard, id)); if(snap.exists()) { document.getElementById('write-title').value = snap.data().title; document.getElementById('write-content').innerHTML = snap.data().content; } }
             document.getElementById('write-modal').classList.remove('hidden');
         };
-
-        window.viewBoardPost = async function(col, id) {
+        window.saveBoardPost = async () => {
+            const t = document.getElementById('write-title').value.trim(); const c = document.getElementById('write-content').innerHTML;
+            if(!t) return window.showToast('제목 입력 필수', true);
+            try {
+                if(window.editingId) await window.updateDoc(window.doc(window.db, window.currentBoard, window.editingId), {title:t, content:c});
+                else await window.addDoc(window.collection(window.db, window.currentBoard), {title:t, content:c, createdAt: Date.now()});
+                window.closeModal('write-modal'); window.showToast('저장 완료');
+            } catch(e) { window.showToast('실패', true); }
+        };
+        window.viewBoardPost = async (col, id) => {
             const snap = await window.getDoc(window.doc(window.db, col, id)); if(!snap.exists()) return;
-            const data = snap.data(); document.getElementById('view-modal-title').textContent = data.title;
-            document.getElementById('view-modal-date').textContent = col === 'calendar' ? `${data.startDate} ~ ${data.endDate}` : new Date(data.createdAt).toLocaleDateString();
-            document.getElementById('view-modal-content').innerHTML = data.content || '';
-            document.getElementById('view-modal-content').querySelectorAll('img').forEach(img => {
-                img.classList.add('cursor-pointer'); img.onclick = () => window.openLightbox(img.src);
-            });
+            const d = snap.data(); document.getElementById('view-modal-title').textContent = d.title;
+            document.getElementById('view-modal-date').textContent = col === 'calendar' ? `${d.startDate} ~ ${d.endDate}` : new Date(d.createdAt).toLocaleDateString();
+            document.getElementById('view-modal-content').innerHTML = d.content || '';
+            document.getElementById('view-modal-content').querySelectorAll('img').forEach(img => { img.classList.add('cursor-pointer'); img.onclick = () => window.openLightbox(img.src); });
             document.getElementById('view-modal').classList.remove('hidden');
         };
-
-        window.deleteData = function(col, id) {
-            window.showCustomConfirm('삭제 확인', '정말 삭제하시겠습니까?', true, async () => {
-                await window.deleteDoc(window.doc(window.db, col, id)); window.showToast('삭제되었습니다.');
-            });
-        };
-
-        window.showCustomConfirm = function(t, m, isD, cb) {
+        window.deleteData = (col, id) => window.showCustomConfirm('삭제', '정말 삭제하시겠습니까?', true, async () => { await window.deleteDoc(window.doc(window.db, col, id)); window.showToast('삭제됨'); });
+        window.showCustomConfirm = (t, m, d, cb) => {
             document.getElementById('confirm-title').textContent = t; document.getElementById('confirm-msg').innerHTML = m;
-            const b = document.getElementById('confirm-btn');
-            b.className = `flex-1 px-4 py-4 rounded-2xl font-black text-white shadow-xl ${isD ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`;
+            document.getElementById('confirm-btn').className = `flex-1 px-4 py-4 rounded-2xl font-black text-white shadow-xl ${d?'bg-red-600':'bg-blue-600'}`;
             window.confirmCallback = cb; document.getElementById('confirm-modal').classList.remove('hidden');
         };
-        window.executeConfirm = function() { window.closeModal('confirm-modal'); if(window.confirmCallback) window.confirmCallback(); };
-
-        window.filterCharacters = function() {
-            const term = document.getElementById('char-search')?.value.toLowerCase() || '';
-            const list = document.getElementById('character-list'); if(!list) return;
-            list.innerHTML = window.allCharacters.filter(c => c.name.toLowerCase().includes(term)).map(c => `
-                <li class="flex justify-between items-center p-4 border rounded-2xl cursor-pointer transition ${window.selectedCharIdForRide === c.id ? 'bg-blue-50 border-blue-400 text-blue-700 font-black' : 'bg-white hover:bg-gray-50'}" onclick="window.selectCharForRide('${c.id}', '${c.name}')">
-                    <span>${c.name}</span>
-                    <button onclick="window.deleteData('character','${c.id}'); event.stopPropagation();" class="admin-only ${window.isAdmin?'':'hidden'} text-red-400 hover:text-red-600 p-1"><i class="fas fa-trash text-xs"></i></button>
-                </li>`).join('');
-            window.updateAdminUI();
-        };
-
-        window.selectCharForRide = function(id, name) {
-            window.selectedCharIdForRide = (window.selectedCharIdForRide === id ? null : id);
-            document.getElementById('ride-title').textContent = window.selectedCharIdForRide ? `[${name}] 탑승 페트` : '탑승 가능한 페트';
-            window.filterCharacters(); window.filterRidePets();
-        };
-
-        window.filterRidePets = function() {
-            const gal = document.getElementById('ride-pet-gallery'); if(!gal) return;
-            const filtered = window.allRidePets.filter(p => window.selectedCharIdForRide ? (p.chars || []).includes(window.selectedCharIdForRide) : true);
-            gal.innerHTML = filtered.map(p => `
-                <div class="bg-white border border-gray-100 rounded-[1.5rem] overflow-hidden shadow-sm relative group">
-                    <div class="admin-only ${window.isAdmin?'':'hidden'} absolute top-2 right-2 z-10 flex gap-2">
-                        <button onclick="window.showDataModal('ride', '${p.id}')" class="bg-white/90 text-blue-500 p-2 rounded-xl shadow-sm"><i class="fas fa-edit text-xs"></i></button>
-                        <button onclick="window.deleteData('ride', '${p.id}')" class="bg-white/90 text-red-500 p-2 rounded-xl shadow-sm"><i class="fas fa-trash text-xs"></i></button>
-                    </div>
-                    <div class="h-36 bg-gray-50/50 flex items-center justify-center p-6 border-b border-gray-50"><img src="${p.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition duration-500" onclick="window.openLightbox(this.src)"></div>
-                    <div class="p-4 text-center font-black text-gray-800 truncate">${p.name}</div>
-                </div>`).join('') || `<div class="col-span-full text-center text-gray-300 py-24 font-black">데이터가 없습니다.</div>`;
-            window.updateAdminUI();
-        };
-
-        window.filterItems = function() {
-            const gal = document.getElementById('item-gallery'); if(!gal) return;
-            gal.innerHTML = window.allItems.map(item => `
-                <div class="bg-white border border-gray-100 rounded-[1.5rem] shadow-sm overflow-hidden relative">
-                    <div class="admin-only ${window.isAdmin?'':'hidden'} absolute top-2 right-2 z-10 flex gap-2">
-                        <button onclick="window.showDataModal('items', '${item.id}')" class="bg-white/90 text-blue-500 p-2 rounded-xl"><i class="fas fa-edit text-xs"></i></button>
-                        <button onclick="window.deleteData('items', '${item.id}')" class="bg-white/90 text-red-500 p-2 rounded-xl"><i class="fas fa-trash text-xs"></i></button>
-                    </div>
-                    <div class="h-36 bg-gray-50/50 flex items-center justify-center p-6 border-b border-gray-50"><img src="${item.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition duration-500" onclick="window.openLightbox(this.src)"></div>
-                    <div class="p-5"><h4 class="font-black text-sm truncate">${item.name}</h4><p class="text-[10px] text-gray-400 line-clamp-2 mt-1 font-bold">${item.desc || ''}</p></div>
-                </div>`).join('');
-            window.updateAdminUI();
-        };
-
-        window.switchExchangeTab = function(tab) {
-            window.currentExchangeTab = tab;
-            ['tab-buy', 'tab-sell', 'tab-instant'].forEach(id => document.getElementById(id).classList.remove('text-blue-600', 'border-blue-600', 'bg-blue-50/50'));
-            document.getElementById({'구매':'tab-buy','판매':'tab-sell','즉시구매':'tab-instant'}[tab]).classList.add('text-blue-600', 'border-blue-600', 'bg-blue-50/50');
-            const tbody = document.getElementById('exchange-list'); const color = {'구매':'bg-blue-100 text-blue-700', '판매':'bg-red-100 text-red-700', '즉시구매':'bg-yellow-100 text-yellow-700'}[tab];
-            tbody.innerHTML = window.allExchanges.filter(e => e.type === tab).map(item => {
-                const canManage = window.isAdmin || (window.currentUser && item.uid === window.currentUser.uid);
-                return `<tr class="hover:bg-gray-50 border-b border-gray-50 transition"><td class="p-6 text-center"><span class="px-3 py-1.5 rounded-xl text-[10px] font-black ${color}">${item.type}</span></td><td class="p-6 text-center">${item.image?`<img src="${item.image}" class="w-14 h-14 object-cover rounded-[1.2rem] cursor-pointer mx-auto shadow-md" onclick="window.openLightbox(this.src)">`:'-'}</td><td class="p-6 font-black text-gray-800">${item.name}</td><td class="p-6 text-sm text-gray-400 font-bold truncate max-w-xs">${item.desc}</td><td class="p-6 text-center font-black text-brand-gold text-lg">${item.price} VIP</td><td class="p-6 text-center text-sm font-black text-[#5865F2]"><i class="fab fa-discord mr-1"></i>${item.dc}</td><td class="p-6 text-center">${canManage ? `<button onclick="window.showDataModal('exchange', '${item.id}')" class="text-blue-500 hover:bg-blue-50 p-3 rounded-2xl transition"><i class="fas fa-edit"></i></button><button onclick="window.deleteData('exchange', '${item.id}')" class="text-red-500 hover:bg-red-50 p-3 rounded-2xl transition"><i class="fas fa-trash"></i></button>` : '-'}</td></tr>`;
-            }).join('') || `<tr><td colspan="7" class="text-center p-24 text-gray-300 font-black">거래 내역이 없습니다.</td></tr>`;
-        };
-
-        window.showDataModal = async function(col, editId = null) {
-            window.currentCol = col; window.editingId = editId; window.tempImageData = {};
-            const body = document.getElementById('data-modal-body'); document.getElementById('data-modal-title').textContent = editId ? '수정' : '등록';
-            let item = {}; if(editId) { const snap = await window.getDoc(window.doc(window.db, col, editId)); if(snap.exists()) item = snap.data(); if(item.image) window.tempImageData['image'] = item.image; }
-            const imgField = `<div class="mb-8 text-center"><label class="cursor-pointer inline-block"><div class="w-32 h-32 bg-gray-50 border-2 border-dashed border-gray-200 rounded-[2rem] flex items-center justify-center overflow-hidden relative mx-auto hover:border-blue-400 transition"><img id="form-img-preview" src="${item.image||''}" class="w-full h-full object-contain ${item.image?'':'hidden'}"><i class="fas fa-camera text-gray-300 text-3xl ${item.image?'hidden':''}"></i></div><p class="text-[10px] font-black text-gray-400 mt-3 uppercase tracking-widest">사진 첨부</p><input type="file" class="hidden" accept="image/*" onchange="window.handleFormImg(event, 'form-img-preview')"></label></div>`;
+        window.executeConfirm = () => { window.closeModal('confirm-modal'); if(window.confirmCallback) window.confirmCallback(); };
+        window.showDataModal = async (col, id = null) => {
+            window.currentCol = col; window.editingId = id; window.tempImageData = {};
+            const b = document.getElementById('data-modal-body'); document.getElementById('data-modal-title').textContent = id ? '수정' : '등록';
+            let item = {}; if(id) { const s = await window.getDoc(window.doc(window.db, col, id)); if(s.exists()) item = s.data(); if(item.image) window.tempImageData['image'] = item.image; }
+            const imgF = `<div class="mb-8 text-center"><label class="cursor-pointer inline-block"><div class="w-32 h-32 bg-gray-50 border-2 border-dashed border-gray-200 rounded-[2rem] flex items-center justify-center overflow-hidden relative mx-auto hover:border-blue-400 transition"><img id="form-img-p" src="${item.image||''}" class="w-full h-full object-contain ${item.image?'':'hidden'}"><i class="fas fa-camera text-gray-300 text-3xl ${item.image?'hidden':''}"></i></div><input type="file" class="hidden" accept="image/*" onchange="window.hFormImg(event, 'form-img-p')"></label></div>`;
             
-            if(col === 'calendar') { body.innerHTML = `<div class="space-y-6"><div><label class="text-[10px] font-black text-gray-400 mb-2 block uppercase ml-1">일정 제목</label><input type="text" id="f-caltitle" value="${item.title||''}" class="w-full border border-gray-100 rounded-2xl p-5 outline-none font-bold"></div><div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] font-black text-gray-400 mb-2 block ml-1">시작일</label><input type="date" id="f-cals" value="${item.startDate||''}" class="w-full border border-gray-100 rounded-2xl p-5 outline-none font-bold"></div><div><label class="text-[10px] font-black text-gray-400 mb-2 block ml-1">종료일</label><input type="date" id="f-cale" value="${item.endDate||''}" class="w-full border border-gray-100 rounded-2xl p-5 outline-none font-bold"></div></div><div><label class="text-[10px] font-black text-gray-400 mb-2 block ml-1">상세 내용</label><textarea id="f-caldesc" class="w-full border border-gray-100 rounded-2xl p-5 outline-none h-32 font-bold">${item.content||''}</textarea></div></div>`; }
-            else if(col === 'pet') { body.innerHTML = imgField + `<div class="space-y-4"><div><input type="text" id="f-name" value="${item.name||''}" class="w-full border border-gray-100 rounded-2xl p-5 outline-none font-black text-center text-xl" placeholder="페트 이름"></div><div class="grid grid-cols-4 gap-2"><div><label class="block text-[10px] font-black text-blue-500 text-center mb-1">水</label><input type="number" id="f-w" value="${item.attr_w||0}" class="w-full border rounded-xl p-2 text-center font-black"></div><div><label class="block text-[10px] font-black text-yellow-600 text-center mb-1">地</label><input type="number" id="f-e" value="${item.attr_e||0}" class="w-full border rounded-xl p-2 text-center font-black"></div><div><label class="block text-[10px] font-black text-red-500 text-center mb-1">火</label><input type="number" id="f-f" value="${item.attr_f||0}" class="w-full border rounded-xl p-2 text-center font-black"></div><div><label class="block text-[10px] font-black text-green-500 text-center mb-1">風</label><input type="number" id="f-wi" value="${item.attr_wi||0}" class="w-full border rounded-xl p-2 text-center font-black"></div></div><div><label class="block text-[10px] font-black text-brand-gold mb-1 ml-1">총성장률</label><input type="number" step="0.001" id="f-total" value="${item.total||''}" class="w-full border border-gray-100 rounded-2xl p-5 outline-none font-black text-2xl text-brand-gold text-center"></div></div>`; }
-            else if(col === 'character') { body.innerHTML = `<div><label class="text-[10px] font-black text-gray-400 mb-2 block ml-1">캐릭터 이름</label><input type="text" id="f-cname" value="${item.name||''}" class="w-full border border-gray-100 rounded-2xl p-5 font-black text-center text-xl outline-none"></div>`; }
-            else if(col === 'ride') { const cbs = window.allCharacters.map(c => `<label class="flex items-center p-3 border border-gray-50 rounded-2xl hover:bg-gray-50 cursor-pointer transition"><input type="checkbox" class="cb-chars mr-3 w-5 h-5 rounded-lg" value="${c.id}" ${(item.chars||[]).includes(c.id)?'checked':''}><span class="text-sm font-black text-gray-700">${c.name}</span></label>`).join(''); body.innerHTML = imgField + `<div class="space-y-6"><div><label class="text-[10px] font-black text-gray-400 mb-2 block ml-1">탑승 페트 이름</label><input type="text" id="f-rname" value="${item.name||''}" class="w-full border border-gray-100 rounded-2xl p-5 font-black text-center text-xl outline-none"></div><div><label class="text-[10px] font-black text-gray-400 mb-3 block ml-1 uppercase tracking-widest">탑승 가능한 캐릭터 (중복 가능)</label><div class="grid grid-cols-2 gap-3 max-h-52 overflow-y-auto custom-scrollbar border border-gray-100 p-4 rounded-[1.5rem] bg-gray-50/50">${cbs}</div></div></div>`; }
-            else if(col === 'items') { body.innerHTML = imgField + `<div class="space-y-6"><div><label class="text-[10px] font-black text-gray-400 mb-2 block ml-1">아이템명</label><input type="text" id="f-iname" value="${item.name||''}" class="w-full border border-gray-100 rounded-2xl p-5 font-black text-center text-xl outline-none"></div><div><label class="text-[10px] font-black text-gray-400 mb-2 block ml-1">효과 설명</label><textarea id="f-idesc" class="w-full border border-gray-100 rounded-2xl p-5 h-32 font-bold outline-none">${item.desc||''}</textarea></div></div>`; }
-            else if(col === 'exchange') { body.innerHTML = imgField + `<div class="space-y-5"><div><label class="text-[10px] font-black text-gray-400 mb-1 ml-1">거래 분류</label><select id="f-etype" class="w-full border border-gray-100 rounded-2xl p-5 font-black outline-none">${['구매','판매','즉시구매'].map(t=>`<option value="${t}" ${item.type===t?'selected':''}>${t}</option>`).join('')}</select></div><div><label class="text-[10px] font-black text-gray-400 mb-1 ml-1">물품명</label><input type="text" id="f-ename" value="${item.name||''}" class="w-full border border-gray-100 rounded-2xl p-5 font-black outline-none"></div><div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] font-black text-brand-gold mb-1 ml-1">희망 가격(VIP)</label><input type="number" id="f-eprice" value="${item.price||''}" class="w-full border border-gray-100 rounded-2xl p-5 font-black text-brand-gold text-lg outline-none"></div><div><label class="text-[10px] font-black text-[#5865F2] mb-1 ml-1">디스코드 닉네임</label><input type="text" id="f-edc" value="${item.dc||''}" class="w-full border border-gray-100 rounded-2xl p-5 font-black outline-none"></div></div><div><label class="text-[10px] font-black text-gray-400 mb-1 ml-1">상세 설명</label><textarea id="f-edesc" class="w-full border border-gray-100 rounded-2xl p-5 h-24 font-bold outline-none">${item.desc||''}</textarea></div></div>`; }
+            if(col === 'calendar') { b.innerHTML = `<div class="space-y-4"><input type="text" id="f-caltitle" value="${item.title||''}" class="w-full border p-4 rounded-2xl font-bold" placeholder="일정명"><div class="grid grid-cols-2 gap-2"><input type="date" id="f-cals" value="${item.startDate||''}" class="w-full border p-4 rounded-2xl"><input type="date" id="f-cale" value="${item.endDate||''}" class="w-full border p-4 rounded-2xl"></div><textarea id="f-caldesc" class="w-full border p-4 rounded-2xl h-32">${item.content||''}</textarea></div>`; }
+            else if(col === 'pet') { b.innerHTML = imgF + `<div class="space-y-4"><input type="text" id="f-name" value="${item.name||''}" class="w-full border p-4 rounded-2xl font-black text-center" placeholder="페트 이름"><div class="grid grid-cols-4 gap-2">${['w','e','f','wi'].map(k=>`<div><label class="text-[10px] block text-center">${k==='w'?'水':(k==='e'?'地':(k==='f'?'火':'風'))}</label><input type="number" id="f-${k}" value="${item['attr_'+k]||0}" class="w-full border p-2 text-center rounded-xl font-bold"></div>`).join('')}</div><input type="number" step="0.001" id="f-total" value="${item.total||''}" class="w-full border p-4 rounded-2xl text-center font-black text-brand-gold text-2xl" placeholder="총성장률"></div>`; }
+            else if(col === 'character') { b.innerHTML = `<input type="text" id="f-cname" value="${item.name||''}" class="w-full border p-5 rounded-2xl font-black text-center" placeholder="캐릭터명">`; }
+            else if(col === 'ride') { const cbs = window.allCharacters.map(c => `<label class="flex items-center p-3 border rounded-2xl hover:bg-gray-50"><input type="checkbox" class="cb-chars mr-3" value="${c.id}" ${(item.chars||[]).includes(c.id)?'checked':''}>${c.name}</label>`).join(''); b.innerHTML = imgF + `<div class="space-y-4"><input type="text" id="f-rname" value="${item.name||''}" class="w-full border p-4 rounded-2xl font-black text-center" placeholder="탑승 페트 이름"><div class="grid grid-cols-2 gap-2 h-40 overflow-y-auto p-4 border rounded-2xl bg-gray-50">${cbs}</div></div>`; }
+            else if(col === 'items') { b.innerHTML = imgF + `<input type="text" id="f-iname" value="${item.name||''}" class="w-full border p-4 rounded-2xl font-black text-center" placeholder="아이템명"><textarea id="f-idesc" class="w-full border p-4 rounded-2xl h-24 mt-2">${item.desc||''}</textarea>`; }
+            else if(col === 'exchange') { b.innerHTML = imgF + `<div class="space-y-4"><select id="f-etype" class="w-full border p-4 rounded-2xl font-black"><option value="구매" ${item.type==='구매'?'selected':''}>구매</option><option value="판매" ${item.type==='판매'?'selected':''}>판매</option><option value="즉시구매" ${item.type==='즉시구매'?'selected':''}>즉시구매</option></select><input type="text" id="f-ename" value="${item.name||''}" class="w-full border p-4 rounded-2xl font-black" placeholder="물품명"><div class="grid grid-cols-2 gap-2"><input type="number" id="f-eprice" value="${item.price||''}" class="w-full border p-4 rounded-2xl font-black text-brand-gold" placeholder="금액"><input type="text" id="f-edc" value="${item.dc||''}" class="w-full border p-4 rounded-2xl font-black" placeholder="디스코드"></div><textarea id="f-edesc" class="w-full border p-4 rounded-2xl h-24">${item.desc||''}</textarea></div>`; }
             document.getElementById('data-modal').classList.remove('hidden');
         };
-
-        window.handleFormImg = async function(e, pid) {
-            const f = e.target.files[0]; if(!f) return;
-            const b64 = await compressImg(f, 400, 0.7);
-            const pv = document.getElementById(pid); pv.src = b64; pv.classList.remove('hidden');
-            window.tempImageData['image'] = b64;
-        };
-
-        window.saveData = async function() {
+        window.hFormImg = async (e, pid) => { const f = e.target.files[0]; if(!f) return; const b = await compressImg(f, 400, 0.7); const pv = document.getElementById(pid); pv.src = b; pv.classList.remove('hidden'); window.tempImageData['image'] = b; };
+        window.saveData = async () => {
+            const c = window.currentCol; let d = {};
             try {
-                let d = {}; const c = window.currentCol;
-                if(c === 'calendar') { d = { title: document.getElementById('f-caltitle').value, startDate: document.getElementById('f-cals').value, endDate: document.getElementById('f-cale').value, content: document.getElementById('f-caldesc').value }; }
-                else if(c === 'pet') { d = { name: document.getElementById('f-name').value, total: document.getElementById('f-total').value, image: window.tempImageData['image']||'' }; ['w','e','f','wi'].forEach(k => d[`attr_${k}`] = document.getElementById(`f-${k}`).value); }
-                else if(c === 'character') { d = { name: document.getElementById('f-cname').value }; }
-                else if(c === 'ride') { d = { name: document.getElementById('f-rname').value, image: window.tempImageData['image']||'', chars: Array.from(document.querySelectorAll('.cb-chars:checked')).map(cb=>cb.value) }; }
-                else if(c === 'items') { d = { name: document.getElementById('f-iname').value, desc: document.getElementById('f-idesc').value, image: window.tempImageData['image']||'' }; }
-                else if(c === 'exchange') { d = { type: document.getElementById('f-etype').value, name: document.getElementById('f-ename').value, price: document.getElementById('f-eprice').value, dc: document.getElementById('f-edc').value, desc: document.getElementById('f-edesc').value, image: window.tempImageData['image']||'', uid: window.currentUser.uid }; }
-
+                if(c === 'calendar') d = { title: document.getElementById('f-caltitle').value, startDate: document.getElementById('f-cals').value, endDate: document.getElementById('f-cale').value, content: document.getElementById('f-caldesc').value };
+                else if(c === 'pet') { d = { name: document.getElementById('f-name').value, total: document.getElementById('f-total').value, image: window.tempImageData['image']||'' }; ['w','e','f','wi'].forEach(k => d['attr_'+k] = document.getElementById('f-'+k).value); }
+                else if(c === 'character') d = { name: document.getElementById('f-cname').value };
+                else if(c === 'ride') d = { name: document.getElementById('f-rname').value, image: window.tempImageData['image']||'', chars: Array.from(document.querySelectorAll('.cb-chars:checked')).map(cb=>cb.value) };
+                else if(c === 'items') d = { name: document.getElementById('f-iname').value, desc: document.getElementById('f-idesc').value, image: window.tempImageData['image']||'' };
+                else if(c === 'exchange') d = { type: document.getElementById('f-etype').value, name: document.getElementById('f-ename').value, price: document.getElementById('f-eprice').value, dc: document.getElementById('f-edc').value, desc: document.getElementById('f-edesc').value, image: window.tempImageData['image']||'', uid: window.currentUser.uid };
+                
                 if(!window.editingId) d.createdAt = Date.now();
                 if(window.editingId) await window.updateDoc(window.doc(window.db, c, window.editingId), d);
                 else await window.addDoc(window.collection(window.db, c), d);
-                window.closeModal('data-modal'); window.showToast('등록되었습니다.');
-            } catch(e) { window.showToast('내용을 확인해주세요.', true); }
+                window.closeModal('data-modal'); window.showToast('완료');
+            } catch(e) { window.showToast('오류', true); }
         };
-
-        window.showAdminSettings = function() {
+        window.showAdminSettings = () => {
             const l = document.getElementById('admin-cat-list');
-            l.innerHTML = window.allCategories.map(c => `<li class="flex justify-between items-center p-4 bg-gray-50 rounded-2xl border border-gray-100"><span class="font-black text-gray-700">${c.name} (${c.id})</span><button onclick="window.deleteData('categories', '${c.id}')" class="text-red-400 hover:text-red-600 transition p-2"><i class="fas fa-trash"></i></button></li>`).join('');
+            l.innerHTML = window.allCategories.map(c => `<li class="flex justify-between items-center p-4 bg-gray-50 rounded-2xl border"><span>${c.name}</span><button onclick="window.deleteData('categories', '${c.id}')"><i class="fas fa-trash"></i></button></li>`).join('');
             document.getElementById('admin-modal').classList.remove('hidden');
         };
-
-        window.addCategory = async function() {
-            const n = document.getElementById('new-cat-name').value;
-            const i = document.getElementById('new-cat-id').value;
-            if(!n || !i) return window.showToast('정보를 입력하세요', true);
-            await window.setDoc(window.doc(window.db, "categories", i), { name: n, id: i, createdAt: Date.now() });
-            window.showToast('추가되었습니다.');
-        };
+        window.addCategory = async () => { const n = document.getElementById('new-cat-name').value; const i = document.getElementById('new-cat-id').value; if(n&&i) { await window.setDoc(window.doc(window.db, "categories", i), {name: n, id: i, createdAt: Date.now()}); window.showToast('추가됨'); } };
     </script>
 </body>
 </html>
