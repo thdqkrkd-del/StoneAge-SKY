@@ -13,20 +13,14 @@
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
-        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: none; justify-content: center; align-items: center; z-index: 11000; backdrop-filter: blur(8px); }
+        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 11000; backdrop-filter: blur(8px); }
         #lightbox img { max-width: 95%; max-height: 95%; object-fit: contain; border-radius: 8px; }
-        
-        .text-brand-gold { color: #d4af37; }
-        .bg-brand-gold { background-color: #d4af37; }
+        .text-brand-gold { color: #d4af37; } .bg-brand-gold { background-color: #d4af37; }
         .fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
         [contenteditable="true"]:empty:before { content: attr(placeholder); color: #9ca3af; pointer-events: none; display: block; }
-        @keyframes spin { to { transform: rotate(360deg); } }
         .animate-spin { animation: spin 1s linear infinite; }
-
-        /* 로딩 전 깜빡임 방지 */
+        @keyframes spin { to { transform: rotate(360deg); } }
         #auth-overlay, #main-content { display: none; }
     </style>
 </head>
@@ -40,14 +34,13 @@
         </div>
     </div>
 
-    <!-- 로그인 오버레이 (사진 디자인 완벽 반영) -->
+    <!-- 로그인 오버레이 -->
     <div id="auth-overlay" class="fixed inset-0 bg-[url('KakaoTalk_20260514_002507728.jpg')] bg-cover bg-center z-[10000] flex justify-center items-center">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
         <div class="bg-[#f8f9fa] p-10 rounded-[2rem] shadow-2xl w-full max-w-[400px] relative z-10 fade-in flex flex-col items-center">
             <img src="1d9888c7-a24e-46cd-a07e-5e3ecec4f982.png" alt="Logo" class="h-20 mb-6 drop-shadow-md">
             <h2 class="text-[28px] font-black text-[#1a1f2e] mb-2" id="auth-title">로그인</h2>
             <p class="text-sm font-bold text-[#6b7280] mb-8">STONEAGE SKY에 오신 것을 환영합니다</p>
-            
             <div class="w-full space-y-4">
                 <div class="text-left">
                     <label class="text-xs font-black text-[#4b5563] ml-1 mb-1 block">아이디</label>
@@ -57,13 +50,9 @@
                     <label class="text-xs font-black text-[#4b5563] ml-1 mb-1 block">비밀번호</label>
                     <input type="password" id="auth-pw" class="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:border-[#3b82f6] focus:ring-2 focus:ring-blue-500/20 outline-none font-bold transition text-[#1f2937]" placeholder="비밀번호 입력">
                 </div>
-                <div class="pt-2">
-                    <button onclick="window.handleAuthSubmit()" id="auth-btn" class="w-full bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black py-4 rounded-xl shadow-md transition transform active:scale-95 text-lg">입장하기</button>
-                </div>
+                <div class="pt-2"><button onclick="window.handleAuthSubmit()" id="auth-btn" class="w-full bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black py-4 rounded-xl shadow-md transition transform active:scale-95 text-lg">입장하기</button></div>
             </div>
-            <div class="mt-6">
-                <button onclick="window.toggleAuthMode()" id="auth-toggle" class="text-sm text-[#3b82f6] font-black hover:underline">계정이 없으신가요? 회원가입</button>
-            </div>
+            <div class="mt-6"><button onclick="window.toggleAuthMode()" id="auth-toggle" class="text-sm text-[#3b82f6] font-black hover:underline">계정이 없으신가요? 회원가입</button></div>
         </div>
     </div>
 
@@ -94,9 +83,8 @@
         </header>
 
         <main class="flex-grow container mx-auto px-4 py-8">
-            <!-- 1. 홈 배너 및 영역 복구 -->
+            <!-- 1. 홈 배너 및 영역 -->
             <section id="page-home" class="page-section fade-in">
-                <!-- 배너 높이 확장 (모바일 350px, 태블릿 450px, 데스크탑 550px, 라지 650px) -->
                 <div class="max-w-7xl mx-auto rounded-[2.5rem] overflow-hidden shadow-2xl mb-12 bg-gray-900 relative h-[350px] sm:h-[450px] md:h-[550px] lg:h-[650px] w-full flex justify-center items-center group">
                     <img src="Gemini_Generated_Image_4fot0k4fot0k4fot.png" class="absolute inset-0 w-full h-full object-cover opacity-90 transition hover:scale-105 duration-1000" onerror="this.style.display='none'">
                     <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
@@ -108,7 +96,7 @@
                 </div>
             </section>
 
-            <!-- 통합 게시판 (공지, 패치, 커스텀) -->
+            <!-- 게시판 -->
             <section id="page-board" class="page-section hidden fade-in max-w-5xl mx-auto">
                 <div class="flex justify-between items-center mb-8"><h2 id="board-title" class="text-3xl font-black">게시판</h2><button onclick="window.showWriteModal()" class="admin-only hidden bg-[#4285F4] hover:bg-blue-600 transition shadow-lg text-white px-6 py-3 rounded-xl font-black">글쓰기</button></div>
                 <div class="bg-white border rounded-[2rem] shadow-xl overflow-hidden"><table class="w-full text-left"><thead class="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase"><tr><th class="p-8">제목</th><th class="p-8 text-center w-40">날짜</th><th class="admin-only hidden p-8 text-center w-24">관리</th></tr></thead><tbody id="board-list" class="divide-y divide-gray-50"></tbody></table></div>
@@ -118,8 +106,6 @@
             <section id="page-pet" class="page-section hidden fade-in max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-black">페트 도감</h2><button onclick="window.showDataModal('pet')" class="admin-only hidden bg-[#4285F4] text-white px-6 py-3 rounded-xl font-black shadow-md hover:bg-blue-600 transition">+ 페트 등록</button></div>
                 <div class="mb-8 relative"><i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="pet-search" oninput="window.filterPets()" class="w-full pl-16 pr-6 py-5 bg-white border border-gray-200 rounded-2xl shadow-sm outline-none font-bold" placeholder="페트 이름을 입력하세요..."></div>
-                
-                <!-- 페트 카드 갤러리 -->
                 <div id="pet-gallery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </section>
 
@@ -146,7 +132,7 @@
                     </div>
                     <div class="w-full lg:w-2/3 bg-white border rounded-[1.5rem] shadow-sm p-6 h-[700px] flex flex-col">
                         <div class="flex justify-between items-center mb-4 pb-4 border-b"><h3 id="ride-title" class="font-black text-lg text-blue-600">탑승 가능한 페트</h3><button onclick="window.showDataModal('ride')" class="admin-only hidden bg-[#4285F4] text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-blue-600 transition">+ 탑승 등록</button></div>
-                        <div class="mb-4 relative"><i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" id="ride-pet-search" oninput="window.filterRidePets()" class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm" placeholder="탑승 페트 이름 검색"></div>
+                        <div class="mb-4 relative"><i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" id="ride-pet-search" oninput="window.filterRidePets()" class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm" placeholder="탑승 페트 검색"></div>
                         <div id="ride-pet-gallery" class="flex-grow overflow-y-auto grid grid-cols-2 md:grid-cols-3 gap-4 content-start pr-2 custom-scrollbar"></div>
                     </div>
                 </div>
@@ -154,7 +140,7 @@
 
             <!-- 아이템 도감 -->
             <section id="page-item" class="page-section hidden fade-in max-w-6xl mx-auto">
-                <div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-black">아이템 도감</h2><button onclick="window.showDataModal('items')" class="admin-only hidden bg-[#4285F4] text-white px-6 py-3 rounded-xl font-black shadow-md hover:bg-blue-600 transition">+ 아이템 등록</button></div>
+                <div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-black">아이템 도감</h2><button onclick="window.showDataModal('items')" class="admin-only hidden bg-[#4285F4] text-white px-6 py-3 rounded-xl font-black shadow-md">+ 아이템 등록</button></div>
                 <div class="mb-8 relative"><i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="item-search" oninput="window.filterItems()" class="w-full pl-16 pr-6 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm outline-none font-bold" placeholder="아이템 검색..."></div>
                 <div id="item-gallery" class="grid grid-cols-2 md:grid-cols-5 gap-6"></div>
             </section>
@@ -165,29 +151,16 @@
                 <div class="bg-white border rounded-[2rem] shadow-xl overflow-hidden"><table class="w-full text-left"><thead class="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase"><tr><th class="p-8">일정명</th><th class="p-8 text-center w-48">기간</th><th class="admin-only hidden p-8 text-center w-24">관리</th></tr></thead><tbody id="calendar-list" class="divide-y divide-gray-50"></tbody></table></div>
             </section>
         </main>
-
-        <footer class="bg-white border-t border-gray-50 py-10 mt-auto">
-            <div class="container mx-auto px-4 text-center">
-                <p class="text-[10px] font-black text-gray-300 uppercase">© 2026 STONEAGE SKY. All rights reserved.</p>
-            </div>
-        </footer>
     </div>
 
-    <!-- 게시판 글쓰기 모달 (사진 양식 100% 동일) -->
+    <!-- 2. 게시판 글쓰기 모달 -->
     <div id="write-modal" class="fixed inset-0 bg-black/60 hidden justify-center items-center z-[110] p-4 backdrop-blur-sm">
         <div class="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden fade-in">
             <div class="p-4 border-b flex justify-between items-center bg-white"><h3 id="write-modal-title" class="text-lg font-black text-gray-800">등록</h3><button onclick="window.closeModal('write-modal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button></div>
-            
             <div class="p-6 overflow-y-auto flex-grow bg-white">
-                <div class="mb-6">
-                    <label class="block text-sm font-bold text-[#4b5563] mb-2">제목</label>
-                    <input type="text" id="write-title" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-[#3b82f6] outline-none transition">
-                </div>
-                
-                <div class="">
+                <div class="mb-6"><label class="block text-sm font-bold text-[#4b5563] mb-2">제목</label><input type="text" id="write-title" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-[#3b82f6] outline-none transition"></div>
+                <div>
                     <label class="block text-sm font-bold text-[#4b5563] mb-2">내용 (이미지 첨부 가능)</label>
-                    
-                    <!-- 제공해주신 사진(image_17119f.png)과 동일한 에디터 툴바 -->
                     <div class="border border-gray-200 rounded-t-lg bg-[#f8f9fa] flex items-center gap-3 px-4 py-2 text-[#4b5563] text-sm font-medium">
                         <div class="flex items-center cursor-pointer hover:bg-gray-200 px-2 py-1 rounded">Normal <i class="fas fa-sort ml-2 text-[10px]"></i></div>
                         <div class="w-px h-4 bg-gray-300"></div>
@@ -204,35 +177,24 @@
                         </div>
                         <div class="w-px h-4 bg-gray-300"></div>
                         <div class="flex items-center gap-2">
-                            <label class="cursor-pointer hover:text-[#1f2937] hover:bg-gray-200 p-1.5 rounded" title="사진 첨부">
-                                <i class="far fa-image text-base"></i>
-                                <input type="file" class="hidden" accept="image/*" onchange="window.handleEditorImageUpload(event)">
-                            </label>
+                            <label class="cursor-pointer hover:text-[#1f2937] hover:bg-gray-200 p-1.5 rounded" title="사진 첨부"><i class="far fa-image text-base"></i><input type="file" class="hidden" accept="image/*" onchange="window.handleEditorImageUpload(event)"></label>
                             <button class="hover:text-[#1f2937] hover:bg-gray-200 p-1.5 rounded"><i class="fas fa-link text-sm"></i></button>
                             <button onclick="document.execCommand('removeFormat')" class="hover:text-[#1f2937] hover:bg-gray-200 p-1.5 rounded font-serif italic text-base">T<sub class="text-[10px] -ml-1">x</sub></button>
                         </div>
                     </div>
-                    <!-- 에디터 본문 -->
                     <div id="write-content" onmouseup="window.saveEditorSelection()" onkeyup="window.saveEditorSelection()" class="w-full h-[350px] p-4 border border-t-0 border-gray-200 rounded-b-lg focus:outline-none overflow-y-auto font-medium bg-white" contenteditable="true"></div>
                 </div>
             </div>
-            <!-- 하단 버튼: 취소(텍스트), 저장(파란색 버튼) -->
-            <div class="p-4 border-t bg-white flex justify-end items-center gap-4">
-                <button onclick="window.closeModal('write-modal')" class="font-bold text-[#4b5563] hover:text-gray-900 transition px-2">취소</button>
-                <button onclick="window.saveBoardPost()" class="px-8 py-2 rounded-lg font-bold text-white bg-[#3b82f6] hover:bg-blue-600 shadow-sm transition">저장</button>
-            </div>
+            <div class="p-4 border-t bg-white flex justify-end items-center gap-4"><button onclick="window.closeModal('write-modal')" class="font-bold text-[#4b5563] hover:text-gray-900 transition px-2">취소</button><button onclick="window.saveBoardPost()" class="px-8 py-2 rounded-lg font-bold text-white bg-[#3b82f6] hover:bg-blue-600 shadow-sm transition">저장</button></div>
         </div>
     </div>
 
-    <!-- 데이터 등록 모달 (페트 다크테마 데이터 입력) -->
+    <!-- 3. 데이터 등록 모달 (페트 다크테마 데이터 입력) -->
     <div id="data-modal" class="fixed inset-0 bg-black/60 hidden justify-center items-center z-[110] p-4 backdrop-blur-sm">
         <div class="bg-white rounded-xl w-full max-w-xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden fade-in">
             <div class="p-4 border-b flex justify-between items-center bg-white"><h3 id="data-modal-title" class="text-lg font-black text-gray-800">등록</h3><button onclick="window.closeModal('data-modal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button></div>
             <div id="data-modal-body" class="p-6 overflow-y-auto flex-grow custom-scrollbar"></div>
-            <div class="p-4 border-t bg-white flex justify-end gap-4 items-center">
-                <button onclick="window.closeModal('data-modal')" class="font-bold text-[#4b5563] hover:text-gray-900 px-2">취소</button>
-                <button onclick="window.saveData()" class="px-8 py-2 rounded-lg font-bold text-white bg-[#3b82f6] hover:bg-blue-600 shadow-sm">저장</button>
-            </div>
+            <div class="p-4 border-t bg-white flex justify-end gap-4 items-center"><button onclick="window.closeModal('data-modal')" class="font-bold text-[#4b5563] hover:text-gray-900 px-2">취소</button><button onclick="window.saveData()" class="px-8 py-2 rounded-lg font-bold text-white bg-[#3b82f6] hover:bg-blue-600 shadow-sm">저장</button></div>
         </div>
     </div>
 
@@ -247,8 +209,7 @@
     <div id="confirm-modal" class="fixed inset-0 bg-black/60 hidden justify-center items-center z-[500] p-4 backdrop-blur-sm">
         <div class="bg-white rounded-xl w-full max-w-sm p-8 text-center shadow-2xl">
             <div id="confirm-icon-wrap" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl bg-yellow-50 text-yellow-500"><i class="fas fa-exclamation-triangle"></i></div>
-            <h3 id="confirm-title" class="text-xl font-black mb-2">확인</h3>
-            <p id="confirm-msg" class="text-gray-500 font-bold mb-8"></p>
+            <h3 id="confirm-title" class="text-xl font-black mb-2">확인</h3><p id="confirm-msg" class="text-gray-500 font-bold mb-8"></p>
             <div class="flex gap-3"><button onclick="window.closeModal('confirm-modal')" class="flex-1 px-4 py-2 rounded-lg font-bold text-gray-600 bg-gray-100 hover:bg-gray-200">아니오</button><button onclick="window.executeConfirm()" id="confirm-btn" class="flex-1 px-4 py-2 rounded-lg font-bold text-white bg-[#3b82f6] shadow-md">예</button></div>
         </div>
     </div>
@@ -265,15 +226,13 @@
 
     <div id="lightbox" onclick="window.closeLightbox(event)"><img id="lightbox-img" src=""></div>
 
-    <!-- UI 및 전역 함수 스크립트 -->
+    <!-- 스크립트 기능 -->
     <script>
-        // 전역 변수 초기화
-        window.allPets = []; window.allCharacters = []; window.allRidePets = []; window.allItems = []; window.allExchanges = []; window.allCategories = [];
-        window.currentBoard = ''; window.editingId = null; window.tempImageData = {}; window.unsubs = {}; window.currentExchangeTab = '구매';
-        window.isAdmin = false; window.savedEditorRange = null; window.selectedCharIdForRide = null; window.authMode = 'login';
+        window.allPets=[]; window.allCharacters=[]; window.allRidePets=[]; window.allItems=[]; window.allExchanges=[]; window.allCategories=[];
+        window.currentBoard=''; window.editingId=null; window.tempImageData={}; window.unsubs={}; window.currentExchangeTab='구매';
+        window.isAdmin=false; window.savedEditorRange=null; window.selectedCharIdForRide=null; window.authMode='login';
 
-        // 기본 유틸 함수
-        window.showToast = (msg, isE = false) => { const t = document.createElement('div'); t.className = `fixed bottom-10 left-1/2 -translate-x-1/2 px-10 py-4 rounded-full shadow-2xl font-black z-[12000] fade-in text-white ${isE?'bg-red-500':'bg-[#1f2937]'}`; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2500); };
+        window.showToast = (msg, isE=false) => { const t = document.createElement('div'); t.className = `fixed bottom-10 left-1/2 -translate-x-1/2 px-10 py-4 rounded-full shadow-2xl font-black z-[12000] fade-in text-white ${isE?'bg-red-500':'bg-[#1f2937]'}`; t.textContent = msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 2500); };
         window.closeModal = (id) => document.getElementById(id).style.display = 'none';
         window.openLightbox = (src) => { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'flex'; };
         window.closeLightbox = (e) => { if(e.target.id !== 'lightbox-img') document.getElementById('lightbox').style.display = 'none'; };
@@ -283,44 +242,38 @@
             const ab = document.getElementById('admin-setting-btn'); if(ab) ab.style.display = window.isAdmin ? 'block' : 'none';
         };
 
-        const drawAttrBlocks = (val, colorClass) => {
-            let blocks = ''; for(let i=0; i<10; i++) { blocks += `<div class="w-3 h-2 rounded-sm ${i < val ? colorClass : 'bg-[#2a3040]'}"></div>`; }
-            return `<div class="flex gap-1 items-center">${blocks}</div>`;
-        };
+        const drawAttrBlocks = (val, colorClass) => { let blocks=''; for(let i=0; i<10; i++) { blocks += `<div class="w-3 h-2 rounded-sm ${i<val?colorClass:'bg-[#2a3040]'}"></div>`; } return `<div class="flex gap-1 items-center">${blocks}</div>`; };
 
-        // 데이터 필터 및 렌더링 함수
         window.filterPets = () => {
-            const term = document.getElementById('pet-search')?.value.toLowerCase() || '';
+            const term = document.getElementById('pet-search')?.value.toLowerCase()||'';
             const gal = document.getElementById('pet-gallery'); if(!gal) return;
             const filtered = window.allPets.filter(p => p.name.toLowerCase().includes(term));
             
             gal.innerHTML = filtered.map(p => `
-                <div class="bg-[#121824] rounded-[1.5rem] overflow-hidden shadow-2xl text-white relative flex flex-col h-full border border-gray-800/80 p-5">
+                <div class="bg-[#121824] rounded-[1.5rem] overflow-hidden shadow-xl text-white relative flex flex-col h-full border border-gray-800/80 p-5">
                     <div class="admin-only absolute top-3 right-3 z-10 flex gap-1" style="display: ${window.isAdmin?'flex':'none'}">
                         <button onclick="window.showDataModal('pet', '${p.id}')" class="bg-black/50 hover:bg-blue-500 p-2 rounded-lg transition"><i class="fas fa-edit text-xs"></i></button>
                         <button onclick="window.deleteData('pet', '${p.id}')" class="bg-black/50 hover:bg-red-500 p-2 rounded-lg transition"><i class="fas fa-trash text-xs"></i></button>
                     </div>
                     <div class="flex gap-4 mb-4">
-                        <div class="w-28 h-28 rounded-2xl border border-gray-600 bg-gradient-to-b from-[#1a2332] to-black flex items-center justify-center p-2 shrink-0">
-                            <img src="${p.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition" onclick="window.openLightbox(this.src)">
-                        </div>
+                        <div class="w-28 h-28 rounded-2xl border border-gray-600 bg-gradient-to-b from-[#1a2332] to-black flex items-center justify-center p-2 shrink-0"><img src="${p.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition" onclick="window.openLightbox(this.src)"></div>
                         <div class="flex flex-col flex-grow justify-center">
                             <div class="flex justify-between items-start mb-2"><h4 class="font-black text-xl text-white leading-tight break-keep pr-2">${p.name}</h4></div>
                             <div class="flex flex-wrap gap-2 mb-3">
-                                ${p.attr_w > 0 ? `<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-blue-400">水</span> ${p.attr_w}</span>` : ''}
-                                ${p.attr_e > 0 ? `<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-yellow-600">地</span> ${p.attr_e}</span>` : ''}
-                                ${p.attr_f > 0 ? `<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-red-500">火</span> ${p.attr_f}</span>` : ''}
-                                ${p.attr_wi > 0 ? `<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-green-500">風</span> ${p.attr_wi}</span>` : ''}
+                                ${p.attr_w>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-blue-400">水</span> ${p.attr_w}</span>`:''}
+                                ${p.attr_e>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-yellow-600">地</span> ${p.attr_e}</span>`:''}
+                                ${p.attr_f>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-red-500">火</span> ${p.attr_f}</span>`:''}
+                                ${p.attr_wi>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-green-500">風</span> ${p.attr_wi}</span>`:''}
                             </div>
                             <div class="space-y-1.5">
-                                ${p.attr_w > 0 ? `<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_w, 'bg-blue-500')} <span class="text-[10px] text-blue-500 font-bold">水</span></div>` : ''}
-                                ${p.attr_e > 0 ? `<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_e, 'bg-yellow-600')} <span class="text-[10px] text-yellow-600 font-bold">地</span></div>` : ''}
-                                ${p.attr_f > 0 ? `<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_f, 'bg-red-500')} <span class="text-[10px] text-red-500 font-bold">火</span></div>` : ''}
-                                ${p.attr_wi > 0 ? `<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_wi, 'bg-green-500')} <span class="text-[10px] text-green-500 font-bold">風</span></div>` : ''}
+                                ${p.attr_w>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_w,'bg-blue-500')} <span class="text-[10px] text-blue-500 font-bold">水</span></div>`:''}
+                                ${p.attr_e>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_e,'bg-yellow-600')} <span class="text-[10px] text-yellow-600 font-bold">地</span></div>`:''}
+                                ${p.attr_f>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_f,'bg-red-500')} <span class="text-[10px] text-red-500 font-bold">火</span></div>`:''}
+                                ${p.attr_wi>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_wi,'bg-green-500')} <span class="text-[10px] text-green-500 font-bold">風</span></div>`:''}
                             </div>
                         </div>
                     </div>
-                    <div class="flex justify-center mb-4"><span class="px-4 py-1 rounded-full bg-[#1a2332] text-xs font-bold text-gray-300">${p.grade || '일반등급'}</span></div>
+                    <div class="flex justify-center mb-4"><span class="px-4 py-1 rounded-full bg-[#1a2332] text-xs font-bold text-gray-300">${p.grade||'일반등급'}</span></div>
                     <div class="mb-4">
                         <p class="text-[10px] text-gray-500 font-bold mb-1 ml-1">초기치</p>
                         <div class="grid grid-cols-4 gap-2 text-center">
@@ -339,12 +292,10 @@
                             <div class="border border-yellow-700/50 rounded-xl p-2 bg-[#0f141e] flex flex-col justify-center"><span class="text-[10px] text-gray-400 mb-1">내구</span><span class="font-black text-yellow-500">${p.ghp||'-'}</span></div>
                         </div>
                     </div>
-                    <div class="border border-yellow-700/50 rounded-xl bg-yellow-900/20 p-4 flex justify-between items-center mb-4">
-                        <span class="text-xs text-gray-400 font-bold">총성장률</span><span class="font-black text-yellow-500 text-xl">${p.total||'-'}</span>
-                    </div>
+                    <div class="border border-yellow-700/50 rounded-xl bg-yellow-900/20 p-4 flex justify-between items-center mb-4"><span class="text-xs text-gray-400 font-bold">총성장률</span><span class="font-black text-yellow-500 text-xl">${p.total||'-'}</span></div>
                     <hr class="border-gray-700 mb-4">
                     <div class="space-y-3 mt-auto">
-                        <div class="flex justify-between items-center"><span class="text-[11px] text-gray-500 font-bold">탑승</span>${p.isRideable ? `<span class="px-2 py-1 rounded border border-green-600/50 bg-green-900/20 text-[10px] font-black text-green-500">✓ 가능</span>` : `<span class="px-2 py-1 rounded border border-gray-700 bg-gray-800 text-[10px] font-black text-gray-500">불가</span>`}</div>
+                        <div class="flex justify-between items-center"><span class="text-[11px] text-gray-500 font-bold">탑승</span>${p.isRideable?`<span class="px-2 py-1 rounded border border-green-600/50 bg-green-900/20 text-[10px] font-black text-green-500">✓ 가능</span>`:`<span class="px-2 py-1 rounded border border-gray-700 bg-gray-800 text-[10px] font-black text-gray-500">불가</span>`}</div>
                         <div class="flex justify-between items-center"><span class="text-[11px] text-gray-500 font-bold">획득처</span><span class="text-xs font-bold text-gray-300">${p.obtain||'-'}</span></div>
                     </div>
                 </div>`).join('');
@@ -353,7 +304,7 @@
         };
 
         window.filterCharacters = () => {
-            const term = document.getElementById('char-search')?.value.toLowerCase() || '';
+            const term = document.getElementById('char-search')?.value.toLowerCase()||'';
             const list = document.getElementById('character-list'); if(!list) return;
             list.innerHTML = window.allCharacters.filter(c => c.name.toLowerCase().includes(term)).map(c => `
                 <li onclick="window.selectCharForRide('${c.id}', '${c.name}')" class="flex justify-between items-center p-3 border rounded-lg cursor-pointer transition ${window.selectedCharIdForRide===c.id?'bg-blue-50 border-blue-400 text-blue-700 font-bold':'bg-white hover:bg-gray-50'}">
@@ -363,14 +314,10 @@
             window.updateAdminUI();
         };
 
-        window.selectCharForRide = (id, n) => {
-            window.selectedCharIdForRide = (window.selectedCharIdForRide === id ? null : id);
-            document.getElementById('ride-title').textContent = window.selectedCharIdForRide ? `[${n}] 탑승 페트` : '탑승 가능한 페트';
-            window.filterCharacters(); window.filterRidePets();
-        };
+        window.selectCharForRide = (id, n) => { window.selectedCharIdForRide = (window.selectedCharIdForRide===id?null:id); document.getElementById('ride-title').textContent = window.selectedCharIdForRide ? `[${n}] 탑승 페트` : '탑승 가능한 페트'; window.filterCharacters(); window.filterRidePets(); };
 
         window.filterRidePets = () => {
-            const term = document.getElementById('ride-pet-search')?.value.toLowerCase() || '';
+            const term = document.getElementById('ride-pet-search')?.value.toLowerCase()||'';
             const gal = document.getElementById('ride-pet-gallery'); if(!gal) return;
             const filtered = window.allRidePets.filter(p => { const isN = p.name.toLowerCase().includes(term); const isC = window.selectedCharIdForRide ? (p.chars||[]).includes(window.selectedCharIdForRide) : true; return isN && isC; });
             gal.innerHTML = filtered.map(p => `
@@ -386,7 +333,7 @@
         };
 
         window.filterItems = () => {
-            const term = document.getElementById('item-search')?.value.toLowerCase() || '';
+            const term = document.getElementById('item-search')?.value.toLowerCase()||'';
             const gal = document.getElementById('item-gallery'); if(!gal) return;
             const filtered = window.allItems.filter(i => i.name.toLowerCase().includes(term));
             gal.innerHTML = filtered.map(i => `
@@ -396,44 +343,45 @@
                         <button onclick="window.deleteData('items', '${i.id}')" class="bg-white/90 hover:bg-red-50 text-red-500 p-1.5 rounded"><i class="fas fa-trash text-xs"></i></button>
                     </div>
                     <div class="h-28 bg-gray-50 flex items-center justify-center p-3 border-b"><img src="${i.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition drop-shadow" onclick="window.openLightbox(this.src)"></div>
-                    <div class="p-3 font-bold text-xs text-center truncate text-gray-800">${i.name}</div>
+                    <div class="p-3">
+                        <div class="font-bold text-xs text-center truncate text-gray-800">${i.name}</div>
+                        <div class="text-[10px] text-gray-500 mt-1 line-clamp-2 text-center leading-tight break-keep">${i.desc||''}</div>
+                    </div>
                 </div>`).join('') || `<div class="col-span-full text-center text-gray-400 py-10 text-sm font-bold">검색 결과가 없습니다.</div>`;
             window.updateAdminUI();
         };
 
         window.switchExchangeTab = (tab) => {
             window.currentExchangeTab = tab;
-            const term = document.getElementById('exchange-search')?.value.toLowerCase() || '';
+            const term = document.getElementById('exchange-search')?.value.toLowerCase()||'';
             ['tab-buy', 'tab-sell', 'tab-instant'].forEach(id => document.getElementById(id).classList.remove('text-blue-600', 'border-blue-600'));
             const activeId = {'구매':'tab-buy','판매':'tab-sell','즉시구매':'tab-instant'}[tab];
             document.getElementById(activeId).classList.add('text-blue-600', 'border-blue-600');
-            
             const tbody = document.getElementById('exchange-list');
             const color = {'구매':'bg-blue-100 text-blue-700', '판매':'bg-red-100 text-red-700', '즉시구매':'bg-yellow-100 text-yellow-700'}[tab];
-            
             const filtered = window.allExchanges.filter(e => e.type === tab && e.name.toLowerCase().includes(term));
             
             tbody.innerHTML = filtered.map(item => {
                 const canM = window.isAdmin || (window.currentUser && item.uid === window.currentUser.uid);
+                // 콤마 로직 적용 (toLocaleString)
+                const displayPrice = item.price ? Number(item.price).toLocaleString() : '0';
                 return `<tr class="hover:bg-gray-50 border-b border-gray-100 transition">
                     <td class="p-4 text-center"><span class="px-2 py-1 rounded text-[10px] font-black ${color}">${item.type}</span></td>
                     <td class="p-4 text-center">${item.image?`<img src="${item.image}" class="w-10 h-10 object-cover rounded cursor-pointer mx-auto shadow-sm" onclick="window.openLightbox(this.src)">`:'-'}</td>
                     <td class="p-4 font-bold text-gray-800 text-sm">${item.name}</td>
                     <td class="p-4 text-xs text-gray-500 font-medium truncate max-w-[150px]">${item.desc}</td>
-                    <td class="p-4 text-center font-black text-brand-gold text-sm">${item.price} VIP</td>
+                    <td class="p-4 text-center font-black text-brand-gold text-sm">${displayPrice} VIP</td>
                     <td class="p-4 text-center text-xs font-bold text-[#5865F2]"><i class="fab fa-discord"></i> ${item.dc}</td>
                     <td class="p-4 text-center">${canM ? `<button onclick="window.showDataModal('exchange', '${item.id}')" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded-lg transition"><i class="fas fa-edit"></i></button><button onclick="window.deleteData('exchange', '${item.id}')" class="text-red-500 hover:bg-red-50 p-1.5 rounded-lg transition"><i class="fas fa-trash"></i></button>` : '-'}</td>
                 </tr>`;
             }).join('') || `<tr><td colspan="7" class="text-center p-10 text-gray-400 text-sm font-bold">검색된 거래 내역이 없습니다.</td></tr>`;
         };
 
-        // 에디터 커서 위치 기억 및 이미지 삽입
         window.saveEditorSelection = () => { const s = window.getSelection(); if (s.rangeCount > 0) window.savedEditorRange = s.getRangeAt(0); };
         window.handleEditorImageUpload = async (e) => {
             const f = e.target.files[0]; if(!f) return;
             const b = await compressImg(f, 800, 0.8);
-            const ed = document.getElementById('write-content'); 
-            ed.focus();
+            const ed = document.getElementById('write-content'); ed.focus();
             if(window.savedEditorRange) { const s = window.getSelection(); s.removeAllRanges(); s.addRange(window.savedEditorRange); }
             document.execCommand('insertImage', false, b);
         };
@@ -450,55 +398,43 @@
             });
         }
 
-        // 폼 양식 모달 설정
         window.showDataModal = async (col, id = null) => {
             window.currentCol = col; window.editingId = id; window.tempImageData = {};
             const b = document.getElementById('data-modal-body'); document.getElementById('data-modal-title').textContent = id ? '수정' : '등록';
             let item = {}; if(id) { const s = await window.getDoc(window.doc(window.db, col, id)); if(s.exists()) item = s.data(); if(item.image) window.tempImageData['image'] = item.image; }
             
-            const imgF = `<div class="mb-4 text-center"><label class="cursor-pointer inline-block"><div class="w-24 h-24 bg-gray-50 border border-gray-300 rounded-xl flex items-center justify-center overflow-hidden relative mx-auto hover:bg-gray-100 transition"><img id="form-img-p" src="${item.image||''}" class="w-full h-full object-contain ${item.image?'':'hidden'}"><i class="fas fa-camera text-gray-300 text-2xl ${item.image?'hidden':''}"></i></div><p class="text-[10px] font-bold text-gray-500 mt-2">사진 첨부 (선택)</p><input type="file" class="hidden" accept="image/*" onchange="window.hFormImg(event, 'form-img-p')"></label></div>`;
+            const imgF = `<div class="mb-4 text-center"><label class="cursor-pointer inline-block"><div class="w-24 h-24 bg-gray-50 border border-gray-300 rounded-xl flex items-center justify-center overflow-hidden relative mx-auto hover:bg-gray-100 transition"><img id="form-img-p" src="${item.image||''}" class="w-full h-full object-contain ${item.image?'':'hidden'}"><i class="fas fa-camera text-gray-300 text-2xl ${item.image?'hidden':''}"></i></div><p class="text-[10px] font-bold text-gray-500 mt-2">사진 첨부</p><input type="file" class="hidden" accept="image/*" onchange="window.hFormImg(event, 'form-img-p')"></label></div>`;
             
             if(col === 'calendar') { 
-                b.innerHTML = `<div class="space-y-4"><input type="text" id="f-caltitle" value="${item.title||''}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm outline-none focus:border-blue-500" placeholder="일정 제목"><div class="grid grid-cols-2 gap-3"><input type="date" id="f-cals" value="${item.startDate||''}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm outline-none focus:border-blue-500"><input type="date" id="f-cale" value="${item.endDate||''}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm outline-none focus:border-blue-500"></div><textarea id="f-caldesc" class="w-full border border-gray-300 p-3 rounded-lg h-24 text-sm outline-none focus:border-blue-500" placeholder="상세 내용">${item.content||''}</textarea></div>`; 
+                b.innerHTML = `<div class="space-y-4"><input type="text" id="f-caltitle" value="${item.title||''}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm outline-none" placeholder="일정 제목"><div class="grid grid-cols-2 gap-3"><input type="date" id="f-cals" value="${item.startDate||''}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm outline-none"><input type="date" id="f-cale" value="${item.endDate||''}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm outline-none"></div><textarea id="f-caldesc" class="w-full border border-gray-300 p-3 rounded-lg h-24 text-sm outline-none" placeholder="상세 내용">${item.content||''}</textarea></div>`; 
             }
             else if(col === 'pet') { 
                 b.innerHTML = imgF + `<div class="space-y-3">
-                    <div class="flex gap-2">
-                        <div class="flex-grow"><label class="text-[10px] font-bold text-gray-600 block mb-1">페트 이름</label><input type="text" id="f-name" value="${item.name||''}" class="w-full border border-gray-300 p-2 rounded-lg text-sm outline-none focus:border-blue-500 font-bold" placeholder="이름"></div>
-                        <div class="w-1/3"><label class="text-[10px] font-bold text-gray-600 block mb-1">등급</label><input type="text" id="f-grade" value="${item.grade||'일반등급'}" class="w-full border border-gray-300 p-2 rounded-lg text-sm outline-none focus:border-blue-500" placeholder="일반등급"></div>
-                    </div>
+                    <div class="flex gap-2"><div class="flex-grow"><label class="text-[10px] font-bold text-gray-600 block mb-1">페트 이름</label><input type="text" id="f-name" value="${item.name||''}" class="w-full border border-gray-300 p-2 rounded-lg text-sm outline-none font-bold" placeholder="이름"></div>
+                    <div class="w-1/3"><label class="text-[10px] font-bold text-gray-600 block mb-1">등급</label><input type="text" id="f-grade" value="${item.grade||'일반등급'}" class="w-full border border-gray-300 p-2 rounded-lg text-sm outline-none" placeholder="일반등급"></div></div>
                     <label class="text-[10px] font-bold text-gray-600 block mt-2">속성 갯수 (총 10기준)</label>
-                    <div class="grid grid-cols-4 gap-2 border p-2 rounded-lg bg-gray-50">
-                        ${['w','e','f','wi'].map(k=>`<div><label class="text-[10px] block text-center font-bold ${k==='w'?'text-blue-500':(k==='e'?'text-yellow-600':(k==='f'?'text-red-500':'text-green-500'))}">${k==='w'?'水':(k==='e'?'地':(k==='f'?'火':'風'))}</label><input type="number" id="f-${k}" value="${item['attr_'+k]||0}" class="w-full border border-gray-300 p-1.5 text-center rounded-lg text-xs outline-none focus:border-blue-500"></div>`).join('')}
-                    </div>
+                    <div class="grid grid-cols-4 gap-2 border p-2 rounded-lg bg-gray-50">${['w','e','f','wi'].map(k=>`<div><label class="text-[10px] block text-center font-bold ${k==='w'?'text-blue-500':(k==='e'?'text-yellow-600':(k==='f'?'text-red-500':'text-green-500'))}">${k==='w'?'水':(k==='e'?'地':(k==='f'?'火':'風'))}</label><input type="number" id="f-${k}" value="${item['attr_'+k]||0}" class="w-full border border-gray-300 p-1.5 text-center rounded-lg text-xs outline-none"></div>`).join('')}</div>
                     <label class="text-[10px] font-bold text-gray-600 block mt-2">초기치 스탯</label>
-                    <div class="grid grid-cols-4 gap-2 border p-2 rounded-lg bg-gray-50">
-                        ${['hp','atk','def','agi'].map(k=>`<div><label class="text-[10px] block text-center text-gray-500 font-bold">${k==='hp'?'내구':(k==='atk'?'공격':(k==='def'?'방어':'순발'))}</label><input type="number" id="f-${k}" value="${item[k]||''}" class="w-full border border-gray-300 p-1.5 text-center rounded-lg text-xs outline-none font-bold focus:border-blue-500"></div>`).join('')}
-                    </div>
+                    <div class="grid grid-cols-4 gap-2 border p-2 rounded-lg bg-gray-50">${['hp','atk','def','agi'].map(k=>`<div><label class="text-[10px] block text-center text-gray-500 font-bold">${k==='hp'?'내구':(k==='atk'?'공격':(k==='def'?'방어':'순발'))}</label><input type="number" id="f-${k}" value="${item[k]||''}" class="w-full border border-gray-300 p-1.5 text-center rounded-lg text-xs outline-none font-bold"></div>`).join('')}</div>
                     <label class="text-[10px] font-bold text-gray-600 block mt-2">성장률 스탯</label>
-                    <div class="grid grid-cols-4 gap-2 border border-yellow-200 p-2 rounded-lg bg-yellow-50/50">
-                        ${['ghp','gatk','gdef','gagi'].map(k=>`<div><label class="text-[10px] block text-center text-yellow-700 font-bold">${k==='ghp'?'성내구':(k==='gatk'?'성공격':(k==='gdef'?'성방어':'성순발'))}</label><input type="number" step="0.001" id="f-${k}" value="${item[k]||''}" class="w-full border border-yellow-300 p-1.5 text-center rounded-lg text-xs text-yellow-700 font-bold outline-none focus:border-yellow-500"></div>`).join('')}
-                    </div>
+                    <div class="grid grid-cols-4 gap-2 border border-yellow-200 p-2 rounded-lg bg-yellow-50/50">${['ghp','gatk','gdef','gagi'].map(k=>`<div><label class="text-[10px] block text-center text-yellow-700 font-bold">${k==='ghp'?'성내구':(k==='gatk'?'성공격':(k==='gdef'?'성방어':'성순발'))}</label><input type="number" step="0.001" id="f-${k}" value="${item[k]||''}" class="w-full border border-yellow-300 p-1.5 text-center rounded-lg text-xs text-yellow-700 font-bold outline-none"></div>`).join('')}</div>
                     <div class="flex gap-2 mt-2">
-                        <div class="flex-grow"><label class="text-[10px] font-bold text-yellow-600 block mb-1 ml-1">총성장률</label><input type="number" step="0.001" id="f-total" value="${item.total||''}" class="w-full border border-yellow-400 p-2 rounded-lg text-center font-black text-yellow-600 outline-none bg-yellow-50 focus:ring-1 focus:ring-yellow-500"></div>
-                        <div class="flex-grow"><label class="text-[10px] font-bold text-gray-600 block mb-1 ml-1">획득처</label><input type="text" id="f-obtain" value="${item.obtain||''}" class="w-full border border-gray-300 p-2 rounded-lg text-sm text-center outline-none focus:border-blue-500" placeholder="예: 페트 환생"></div>
+                        <div class="flex-grow"><label class="text-[10px] font-bold text-yellow-600 block mb-1 ml-1">총성장률</label><input type="number" step="0.001" id="f-total" value="${item.total||''}" class="w-full border border-yellow-400 p-2 rounded-lg text-center font-black text-yellow-600 outline-none bg-yellow-50"></div>
+                        <div class="flex-grow"><label class="text-[10px] font-bold text-gray-600 block mb-1 ml-1">획득처</label><input type="text" id="f-obtain" value="${item.obtain||''}" class="w-full border border-gray-300 p-2 rounded-lg text-sm text-center outline-none" placeholder="예: 페트 환생"></div>
                     </div>
-                    <label class="flex items-center gap-2 mt-2 cursor-pointer p-2 border border-gray-200 rounded-lg hover:bg-gray-50"><input type="checkbox" id="f-isride" class="w-4 h-4 rounded" ${item.isRideable ? 'checked' : ''}><span class="text-xs font-bold text-gray-700">탑승 가능한 페트입니까?</span></label>
+                    <label class="flex items-center gap-2 mt-2 cursor-pointer p-2 border border-gray-200 rounded-lg hover:bg-gray-50"><input type="checkbox" id="f-isride" class="w-4 h-4 rounded" ${item.isRideable?'checked':''}><span class="text-xs font-bold text-gray-700">탑승 가능한 페트입니까?</span></label>
                 </div>`; 
             }
-            else if(col === 'character') { b.innerHTML = `<label class="text-sm font-bold block mb-1">캐릭터 이름</label><input type="text" id="f-cname" value="${item.name||''}" class="w-full border border-gray-300 p-3 rounded-lg outline-none font-bold focus:border-blue-500">`; }
-            else if(col === 'ride') { 
-                const cbs = window.allCharacters.map(c => `<label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"><input type="checkbox" class="cb-chars mr-2 w-3 h-3" value="${c.id}" ${(item.chars||[]).includes(c.id)?'checked':''}><span class="text-xs font-bold text-gray-700">${c.name}</span></label>`).join(''); 
-                b.innerHTML = imgF + `<div class="space-y-3"><label class="text-xs font-bold block">탑승 페트 이름</label><input type="text" id="f-rname" value="${item.name||''}" class="w-full border border-gray-300 p-2.5 rounded-lg outline-none text-sm font-bold focus:border-blue-500"><label class="text-xs font-bold block mt-2">탑승 가능한 캐릭터 (체크박스)</label><div class="grid grid-cols-2 gap-2 h-32 overflow-y-auto p-2 border border-gray-200 rounded-lg bg-gray-50">${cbs}</div></div>`; 
-            }
-            else if(col === 'items') { b.innerHTML = imgF + `<div class="space-y-3"><label class="text-xs font-bold block">아이템 이름</label><input type="text" id="f-iname" value="${item.name||''}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm outline-none font-bold focus:border-blue-500"><label class="text-xs font-bold block mt-2">상세 효과/설명</label><textarea id="f-idesc" class="w-full border border-gray-300 p-3 rounded-lg h-20 outline-none text-sm focus:border-blue-500">${item.desc||''}</textarea></div>`; }
+            else if(col === 'character') { b.innerHTML = `<label class="text-sm font-bold block mb-1">캐릭터 이름</label><input type="text" id="f-cname" value="${item.name||''}" class="w-full border border-gray-300 p-3 rounded-lg outline-none font-bold">`; }
+            else if(col === 'ride') { const cbs = window.allCharacters.map(c => `<label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"><input type="checkbox" class="cb-chars mr-2 w-3 h-3" value="${c.id}" ${(item.chars||[]).includes(c.id)?'checked':''}><span class="text-xs font-bold text-gray-700">${c.name}</span></label>`).join(''); b.innerHTML = imgF + `<div class="space-y-3"><label class="text-xs font-bold block">탑승 페트 이름</label><input type="text" id="f-rname" value="${item.name||''}" class="w-full border border-gray-300 p-2.5 rounded-lg outline-none text-sm font-bold"><label class="text-xs font-bold block mt-2">탑승 가능한 캐릭터 (체크박스)</label><div class="grid grid-cols-2 gap-2 h-32 overflow-y-auto p-2 border border-gray-200 rounded-lg bg-gray-50">${cbs}</div></div>`; }
+            else if(col === 'items') { b.innerHTML = imgF + `<div class="space-y-3"><label class="text-xs font-bold block">아이템 이름</label><input type="text" id="f-iname" value="${item.name||''}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm outline-none font-bold"><label class="text-xs font-bold block mt-2">상세 효과/설명</label><textarea id="f-idesc" class="w-full border border-gray-300 p-3 rounded-lg h-20 outline-none text-sm">${item.desc||''}</textarea></div>`; }
             else if(col === 'exchange') { 
                 b.innerHTML = imgF + `<div class="space-y-3">
                 <label class="text-[10px] font-bold text-gray-600 block">분류</label><select id="f-etype" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm outline-none bg-gray-50 font-bold"><option value="구매" ${item.type==='구매'?'selected':''}>구매</option><option value="판매" ${item.type==='판매'?'selected':''}>판매</option><option value="즉시구매" ${item.type==='즉시구매'?'selected':''}>즉시구매</option></select>
-                <label class="text-[10px] font-bold text-gray-600 block">이름 (페트, 아이템)</label><input type="text" id="f-ename" value="${item.name||''}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm outline-none font-bold focus:border-blue-500">
-                <label class="text-[10px] font-bold text-gray-600 block">금액 (VIP)</label><input type="number" id="f-eprice" value="${item.price||''}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm font-bold text-brand-gold outline-none focus:border-blue-500">
-                <label class="text-[10px] font-bold text-[#5865F2] block"><i class="fab fa-discord"></i> 디스코드 닉네임</label><input type="text" id="f-edc" value="${item.dc||''}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm outline-none font-bold focus:border-blue-500" placeholder="예: user#1234">
-                <label class="text-[10px] font-bold text-gray-600 block">설명</label><textarea id="f-edesc" class="w-full border border-gray-300 p-3 rounded-lg h-20 outline-none text-xs focus:border-blue-500" placeholder="상세 정보를 입력하세요">${item.desc||''}</textarea></div>`; 
+                <label class="text-[10px] font-bold text-gray-600 block">이름 (페트, 아이템)</label><input type="text" id="f-ename" value="${item.name||''}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm outline-none font-bold">
+                <label class="text-[10px] font-bold text-gray-600 block">금액 (숫자만 입력)</label><input type="number" id="f-eprice" value="${item.price||''}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm font-bold text-brand-gold outline-none" placeholder="숫자만 입력">
+                <label class="text-[10px] font-bold text-[#5865F2] block"><i class="fab fa-discord"></i> 디스코드 닉네임</label><input type="text" id="f-edc" value="${item.dc||''}" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm outline-none font-bold" placeholder="예: user#1234">
+                <label class="text-[10px] font-bold text-gray-600 block">설명</label><textarea id="f-edesc" class="w-full border border-gray-300 p-3 rounded-lg h-20 outline-none text-xs" placeholder="상세 정보를 입력하세요">${item.desc||''}</textarea></div>`; 
             }
             document.getElementById('data-modal').style.display = 'flex';
         };
@@ -510,13 +446,7 @@
             try {
                 if(c === 'calendar') d = { title: document.getElementById('f-caltitle').value, startDate: document.getElementById('f-cals').value, endDate: document.getElementById('f-cale').value, content: document.getElementById('f-caldesc').value };
                 else if(c === 'pet') { 
-                    d = { 
-                        name: document.getElementById('f-name').value, grade: document.getElementById('f-grade').value,
-                        hp: document.getElementById('f-hp').value, atk: document.getElementById('f-atk').value, def: document.getElementById('f-def').value, agi: document.getElementById('f-agi').value, 
-                        ghp: document.getElementById('f-ghp').value, gatk: document.getElementById('f-gatk').value, gdef: document.getElementById('f-gdef').value, gagi: document.getElementById('f-gagi').value, 
-                        total: document.getElementById('f-total').value, obtain: document.getElementById('f-obtain').value, isRideable: document.getElementById('f-isride').checked,
-                        image: window.tempImageData['image']||'' 
-                    }; 
+                    d = { name: document.getElementById('f-name').value, grade: document.getElementById('f-grade').value, hp: document.getElementById('f-hp').value, atk: document.getElementById('f-atk').value, def: document.getElementById('f-def').value, agi: document.getElementById('f-agi').value, ghp: document.getElementById('f-ghp').value, gatk: document.getElementById('f-gatk').value, gdef: document.getElementById('f-gdef').value, gagi: document.getElementById('f-gagi').value, total: document.getElementById('f-total').value, obtain: document.getElementById('f-obtain').value, isRideable: document.getElementById('f-isride').checked, image: window.tempImageData['image']||'' }; 
                     ['w','e','f','wi'].forEach(k => d['attr_'+k] = document.getElementById('f-'+k).value); 
                 }
                 else if(c === 'character') d = { name: document.getElementById('f-cname').value };
@@ -529,9 +459,8 @@
                 if(window.editingId) {
                     if(!d.image && !window.tempImageData['image']) { const snap = await window.getDoc(window.doc(window.db, c, window.editingId)); if(snap.exists()) d.image = snap.data().image || ''; }
                     await window.updateDoc(window.doc(window.db, c, window.editingId), d);
-                }
-                else await window.addDoc(window.collection(window.db, c), d);
-                window.closeModal('data-modal'); window.showToast('성공적으로 저장되었습니다.');
+                } else await window.addDoc(window.collection(window.db, c), d);
+                window.closeModal('data-modal'); window.showToast('저장되었습니다.');
             } catch(e) { window.showToast('정보를 다시 확인해주세요.', true); }
         };
 
@@ -549,7 +478,7 @@
             try {
                 if(window.editingId) await window.updateDoc(window.doc(window.db, window.currentBoard, window.editingId), {title:t, content:c});
                 else await window.addDoc(window.collection(window.db, window.currentBoard), {title:t, content:c, createdAt: Date.now()});
-                window.closeModal('write-modal'); window.showToast('글이 저장되었습니다.');
+                window.closeModal('write-modal'); window.showToast('저장 완료');
             } catch(e) { window.showToast('저장 실패', true); }
         };
 
@@ -563,7 +492,6 @@
         };
 
         window.deleteData = (col, id) => window.showCustomConfirm('삭제 확인', '정말 삭제하시겠습니까?', true, async () => { await window.deleteDoc(window.doc(window.db, col, id)); window.showToast('삭제 완료'); });
-        
         window.showCustomConfirm = (t, m, d, cb) => {
             document.getElementById('confirm-title').textContent = t; document.getElementById('confirm-msg').textContent = m;
             document.getElementById('confirm-btn').className = `flex-1 px-4 py-2 rounded-lg font-bold text-white shadow-md ${d?'bg-red-500 hover:bg-red-600':'bg-[#3b82f6] hover:bg-blue-600'}`;
@@ -576,41 +504,23 @@
             l.innerHTML = window.allCategories.map(c => `<li class="flex justify-between items-center p-3 bg-white rounded-lg border border-gray-100"><span class="font-bold text-gray-700 text-sm">${c.name} <span class="text-xs text-gray-400">(${c.id})</span></span><button onclick="window.deleteData('categories', '${c.id}')" class="text-red-400 hover:text-red-600 p-1"><i class="fas fa-trash"></i></button></li>`).join('');
             document.getElementById('admin-modal').style.display = 'flex';
         };
+        window.addCategory = async () => { const n = document.getElementById('new-cat-name').value.trim(); const i = document.getElementById('new-cat-id').value.trim(); if(n&&i) { await window.setDoc(window.doc(window.db, "categories", i), {name: n, id: i, createdAt: Date.now()}); window.showToast('게시판 추가됨'); document.getElementById('new-cat-name').value=''; document.getElementById('new-cat-id').value=''; } };
 
-        window.addCategory = async () => { const n = document.getElementById('new-cat-name').value.trim(); const i = document.getElementById('new-cat-id').value.trim(); if(n&&i) { await window.setDoc(window.doc(window.db, "categories", i), {name: n, id: i, createdAt: Date.now()}); window.showToast('메뉴가 추가되었습니다.'); document.getElementById('new-cat-name').value=''; document.getElementById('new-cat-id').value=''; } };
-
-        // [문제 해결] 입장하기 버튼의 로직 추가
-        window.toggleAuthMode = () => { 
-            window.authMode = (window.authMode==='login'?'signup':'login'); 
-            document.getElementById('auth-title').textContent = (window.authMode==='login'?'로그인':'회원가입'); 
-            document.getElementById('auth-btn').textContent = (window.authMode==='login'?'입장하기':'가입하기'); 
-            document.getElementById('auth-toggle').textContent = (window.authMode==='login'?'계정이 없으신가요? 회원가입':'이미 계정이 있으신가요? 로그인'); 
-        };
+        window.toggleAuthMode = () => { window.authMode = (window.authMode==='login'?'signup':'login'); document.getElementById('auth-title').textContent = (window.authMode==='login'?'로그인':'회원가입'); document.getElementById('auth-btn').textContent = (window.authMode==='login'?'입장하기':'가입하기'); document.getElementById('auth-toggle').textContent = (window.authMode==='login'?'계정이 없으신가요? 회원가입':'이미 계정이 있으신가요? 로그인'); };
         
         window.handleAuthSubmit = async () => {
-            if (!window.auth) return window.showToast('서버와 연결 중입니다. 잠시만 기다려주세요.', true);
+            if (!window.auth) return window.showToast('서버 연결 중입니다. 잠시만 대기해주세요.', true);
             const id = document.getElementById('auth-id').value.trim(); const pw = document.getElementById('auth-pw').value;
-            if(!id || !pw) return window.showToast('아이디와 비밀번호를 입력해주세요.', true);
+            if(!id || !pw) return window.showToast('입력 확인', true);
             const e = (id==='milk'?'milk@stoneage.sky':`${id}@stoneage.sky`);
-            
-            const btn = document.getElementById('auth-btn');
-            const originalText = btn.textContent;
-            btn.textContent = '처리 중...'; btn.disabled = true;
-
+            const btn = document.getElementById('auth-btn'); const orig = btn.textContent; btn.textContent = '처리 중...'; btn.disabled = true;
             try {
-                if(window.authMode==='signup') { 
-                    if(id==='milk') throw new Error('forbidden'); 
-                    await window.createUserWithEmailAndPassword(window.auth, e, pw); 
-                } else { 
-                    await window.signInWithEmailAndPassword(window.auth, e, pw); 
-                }
-            } catch(err) { 
-                window.showToast('아이디나 비밀번호를 확인해주세요.', true); 
-                btn.textContent = originalText; btn.disabled = false;
-            }
+                if(window.authMode==='signup') { if(id==='milk') throw new Error(); await window.createUserWithEmailAndPassword(window.auth, e, pw); } 
+                else { await window.signInWithEmailAndPassword(window.auth, e, pw); }
+            } catch(err) { window.showToast('아이디/비번 확인', true); btn.textContent = orig; btn.disabled = false; }
         };
         
-        window.handleLogout = () => window.showCustomConfirm('로그아웃', '접속을 종료하시겠습니까?', false, async () => { await window.signOut(window.auth); window.location.reload(); });
+        window.handleLogout = () => window.showCustomConfirm('로그아웃', '종료하시겠습니까?', false, async () => { await window.signOut(window.auth); window.location.reload(); });
         
         window.showPage = (id) => {
             document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden'));
@@ -623,10 +533,7 @@
         };
 
         window.renderHome = () => {
-            const draw = (id, data, col) => {
-                const el = document.getElementById(id); if(!el) return;
-                el.innerHTML = (data||[]).slice(0, 5).map(i => `<li onclick="window.viewBoardPost('${col}','${i.id}')" class="flex justify-between items-center p-2 cursor-pointer hover:bg-gray-50 rounded-lg transition font-bold text-gray-700"><span>${i.title}</span><span class="text-[10px] text-gray-400 font-black">${new Date(i.createdAt).toLocaleDateString()}</span></li>`).join('') || '<li class="text-xs text-gray-300 py-4 text-center">작성된 글이 없습니다.</li>';
-            };
+            const draw = (id, data, col) => { const el = document.getElementById(id); if(el) el.innerHTML = (data||[]).slice(0, 5).map(i => `<li onclick="window.viewBoardPost('${col}','${i.id}')" class="flex justify-between items-center p-2 cursor-pointer hover:bg-gray-50 rounded-lg transition font-bold text-gray-700"><span>${i.title}</span><span class="text-[10px] text-gray-400 font-black">${new Date(i.createdAt).toLocaleDateString()}</span></li>`).join('') || '<li class="text-xs text-gray-300 py-4 text-center">글 없음</li>'; };
             draw('home-notice-list', window.noticeData, 'notice'); draw('home-patch-list', window.patchData, 'patch');
             const cal = document.getElementById('home-calendar-list'); if(cal) cal.innerHTML = (window.allCalendars||[]).slice(0, 5).map(i => `<li onclick="window.viewBoardPost('calendar','${i.id}')" class="bg-purple-50 p-3 rounded-2xl text-purple-800 cursor-pointer font-black text-xs hover:bg-purple-100 transition flex justify-between items-center"><p class="truncate pr-4">${i.title}</p><p class="opacity-60 text-[10px] whitespace-nowrap">${i.startDate.substring(5).replace('-','.')} ~ ${i.endDate.substring(5).replace('-','.')}</p></li>`).join('') || '<li class="text-xs text-gray-300 text-center py-4">일정 없음</li>';
         };
@@ -643,7 +550,7 @@
         };
     </script>
 
-    <!-- 1세트만 선언된 파이어베이스 연동 -->
+    <!-- Firebase Init & Listeners -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -654,7 +561,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // 창 닫으면 로그아웃 (에러 무시)
         setPersistence(auth, browserSessionPersistence).catch(e => console.error(e));
         
         window.auth = auth; window.db = db;
