@@ -261,15 +261,15 @@
                             <div class="flex justify-between items-start mb-2"><h4 class="font-black text-xl text-white leading-tight break-keep pr-2">${p.name}</h4></div>
                             <div class="flex flex-wrap gap-2 mb-3">
                                 ${p.attr_w>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-blue-400">水</span> ${p.attr_w}</span>`:''}
-                                ${p.attr_e>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-yellow-600">地</span> ${p.attr_e}</span>`:''}
+                                ${p.attr_e>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-green-600">地</span> ${p.attr_e}</span>`:''}
                                 ${p.attr_f>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-red-500">火</span> ${p.attr_f}</span>`:''}
-                                ${p.attr_wi>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-green-500">風</span> ${p.attr_wi}</span>`:''}
+                                ${p.attr_wi>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-yellow-500">風</span> ${p.attr_wi}</span>`:''}
                             </div>
                             <div class="space-y-1.5">
                                 ${p.attr_w>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_w,'bg-blue-500')} <span class="text-[10px] text-blue-500 font-bold">水</span></div>`:''}
-                                ${p.attr_e>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_e,'bg-yellow-600')} <span class="text-[10px] text-yellow-600 font-bold">地</span></div>`:''}
+                                ${p.attr_e>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_e,'bg-yellow-600')} <span class="text-[10px] text-green-600 font-bold">地</span></div>`:''}
                                 ${p.attr_f>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_f,'bg-red-500')} <span class="text-[10px] text-red-500 font-bold">火</span></div>`:''}
-                                ${p.attr_wi>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_wi,'bg-green-500')} <span class="text-[10px] text-green-500 font-bold">風</span></div>`:''}
+                                ${p.attr_wi>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_wi,'bg-green-500')} <span class="text-[10px] text-yellow-500 font-bold">風</span></div>`:''}
                             </div>
                         </div>
                     </div>
@@ -413,7 +413,7 @@
                     <div class="flex gap-2"><div class="flex-grow"><label class="text-[10px] font-bold text-gray-600 block mb-1">페트 이름</label><input type="text" id="f-name" value="${item.name||''}" class="w-full border border-gray-300 p-2 rounded-lg text-sm outline-none font-bold" placeholder="이름"></div>
                     <div class="w-1/3"><label class="text-[10px] font-bold text-gray-600 block mb-1">등급</label><input type="text" id="f-grade" value="${item.grade||'일반등급'}" class="w-full border border-gray-300 p-2 rounded-lg text-sm outline-none" placeholder="일반등급"></div></div>
                     <label class="text-[10px] font-bold text-gray-600 block mt-2">속성 갯수 (총 10기준)</label>
-                    <div class="grid grid-cols-4 gap-2 border p-2 rounded-lg bg-gray-50">${['w','e','f','wi'].map(k=>`<div><label class="text-[10px] block text-center font-bold ${k==='w'?'text-blue-500':(k==='e'?'text-yellow-600':(k==='f'?'text-red-500':'text-green-500'))}">${k==='w'?'水':(k==='e'?'地':(k==='f'?'火':'風'))}</label><input type="number" id="f-${k}" value="${item['attr_'+k]||0}" class="w-full border border-gray-300 p-1.5 text-center rounded-lg text-xs outline-none"></div>`).join('')}</div>
+                    <div class="grid grid-cols-4 gap-2 border p-2 rounded-lg bg-gray-50">${['w','e','f','wi'].map(k=>`<div><label class="text-[10px] block text-center font-bold ${k==='w'?'text-blue-500':(k==='e'?'text-green-500':(k==='f'?'text-red-500':'text-yellow-500'))}">${k==='w'?'水':(k==='e'?'地':(k==='f'?'火':'風'))}</label><input type="number" id="f-${k}" value="${item['attr_'+k]||0}" class="w-full border border-gray-300 p-1.5 text-center rounded-lg text-xs outline-none"></div>`).join('')}</div>
                     <label class="text-[10px] font-bold text-gray-600 block mt-2">초기치 스탯</label>
                     <div class="grid grid-cols-4 gap-2 border p-2 rounded-lg bg-gray-50">${['hp','atk','def','agi'].map(k=>`<div><label class="text-[10px] block text-center text-gray-500 font-bold">${k==='hp'?'내구':(k==='atk'?'공격':(k==='def'?'방어':'순발'))}</label><input type="number" id="f-${k}" value="${item[k]||''}" class="w-full border border-gray-300 p-1.5 text-center rounded-lg text-xs outline-none font-bold"></div>`).join('')}</div>
                     <label class="text-[10px] font-bold text-gray-600 block mt-2">성장률 스탯</label>
@@ -423,7 +423,7 @@
                         <div class="flex-grow"><label class="text-[10px] font-bold text-gray-600 block mb-1 ml-1">획득처</label><input type="text" id="f-obtain" value="${item.obtain||''}" class="w-full border border-gray-300 p-2 rounded-lg text-sm text-center outline-none" placeholder="예: 페트 환생"></div>
                     </div>
                     <label class="flex items-center gap-2 mt-2 cursor-pointer p-2 border border-gray-200 rounded-lg hover:bg-gray-50"><input type="checkbox" id="f-isride" class="w-4 h-4 rounded" ${item.isRideable?'checked':''}><span class="text-xs font-bold text-gray-700">탑승 가능한 페트입니까?</span></label>
-                </div>`; 
+                </div>`;  
             }
             else if(col === 'character') { b.innerHTML = `<label class="text-sm font-bold block mb-1">캐릭터 이름</label><input type="text" id="f-cname" value="${item.name||''}" class="w-full border border-gray-300 p-3 rounded-lg outline-none font-bold">`; }
             else if(col === 'ride') { const cbs = window.allCharacters.map(c => `<label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"><input type="checkbox" class="cb-chars mr-2 w-3 h-3" value="${c.id}" ${(item.chars||[]).includes(c.id)?'checked':''}><span class="text-xs font-bold text-gray-700">${c.name}</span></label>`).join(''); b.innerHTML = imgF + `<div class="space-y-3"><label class="text-xs font-bold block">탑승 페트 이름</label><input type="text" id="f-rname" value="${item.name||''}" class="w-full border border-gray-300 p-2.5 rounded-lg outline-none text-sm font-bold"><label class="text-xs font-bold block mt-2">탑승 가능한 캐릭터 (체크박스)</label><div class="grid grid-cols-2 gap-2 h-32 overflow-y-auto p-2 border border-gray-200 rounded-lg bg-gray-50">${cbs}</div></div>`; }
