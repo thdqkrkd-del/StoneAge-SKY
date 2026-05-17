@@ -244,7 +244,7 @@
 
         const drawAttrBlocks = (val, colorClass) => { let blocks=''; for(let i=0; i<10; i++) { blocks += `<div class="w-3 h-2 rounded-sm ${i<val?colorClass:'bg-[#2a3040]'}"></div>`; } return `<div class="flex gap-1 items-center">${blocks}</div>`; };
 
-        window.filterPets = () => {
+       window.filterPets = () => {
             const term = document.getElementById('pet-search')?.value.toLowerCase()||'';
             const gal = document.getElementById('pet-gallery'); if(!gal) return;
             const filtered = window.allPets.filter(p => p.name.toLowerCase().includes(term));
@@ -261,15 +261,15 @@
                             <div class="flex justify-between items-start mb-2"><h4 class="font-black text-xl text-white leading-tight break-keep pr-2">${p.name}</h4></div>
                             <div class="flex flex-wrap gap-2 mb-3">
                                 ${p.attr_w>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-blue-400">水</span> ${p.attr_w}</span>`:''}
-                                ${p.attr_e>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-green-600">地</span> ${p.attr_e}</span>`:''}
+                                ${p.attr_e>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-green-500">地</span> ${p.attr_e}</span>`:''}
                                 ${p.attr_f>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-red-500">火</span> ${p.attr_f}</span>`:''}
                                 ${p.attr_wi>0?`<span class="px-2 py-0.5 border border-gray-600 rounded-full text-xs font-bold bg-transparent"><span class="text-yellow-500">風</span> ${p.attr_wi}</span>`:''}
                             </div>
                             <div class="space-y-1.5">
                                 ${p.attr_w>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_w,'bg-blue-500')} <span class="text-[10px] text-blue-500 font-bold">水</span></div>`:''}
-                                ${p.attr_e>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_e,'bg-yellow-600')} <span class="text-[10px] text-green-600 font-bold">地</span></div>`:''}
+                                ${p.attr_e>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_e,'bg-green-500')} <span class="text-[10px] text-green-500 font-bold">地</span></div>`:''}
                                 ${p.attr_f>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_f,'bg-red-500')} <span class="text-[10px] text-red-500 font-bold">火</span></div>`:''}
-                                ${p.attr_wi>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_wi,'bg-green-500')} <span class="text-[10px] text-yellow-500 font-bold">風</span></div>`:''}
+                                ${p.attr_wi>0?`<div class="flex items-center gap-2">${drawAttrBlocks(p.attr_wi,'bg-yellow-500')} <span class="text-[10px] text-yellow-500 font-bold">風</span></div>`:''}
                             </div>
                         </div>
                     </div>
@@ -300,6 +300,17 @@
                     </div>
                 </div>`).join('');
             if(filtered.length === 0) gal.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10 font-bold">검색 결과가 없습니다.</div>`;
+            window.updateAdminUI();
+        };
+
+        window.filterCharacters = () => {
+            const term = document.getElementById('char-search')?.value.toLowerCase()||'';
+            const list = document.getElementById('character-list'); if(!list) return;
+            list.innerHTML = window.allCharacters.filter(c => c.name.toLowerCase().includes(term)).map(c => `
+                <li onclick="window.selectCharForRide('${c.id}', '${c.name}')" class="flex justify-between items-center p-3 border rounded-lg cursor-pointer transition ${window.selectedCharIdForRide===c.id?'bg-blue-50 border-blue-400 text-blue-700 font-bold':'bg-white hover:bg-gray-50'}">
+                    <span class="text-sm">${c.name}</span>
+                    <button onclick="window.deleteData('character','${c.id}'); event.stopPropagation();" class="admin-only text-red-400 hover:text-red-600 p-1" style="display: ${window.isAdmin?'block':'none'}"><i class="fas fa-trash text-xs"></i></button>
+                </li>`).join('');
             window.updateAdminUI();
         };
 
