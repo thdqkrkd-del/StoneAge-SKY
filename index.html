@@ -348,15 +348,16 @@
             const gal = document.getElementById('item-gallery'); if(!gal) return;
             const filtered = window.allItems.filter(i => i.name.toLowerCase().includes(term));
             gal.innerHTML = filtered.map(i => `
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden relative">
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden relative flex flex-col h-full">
                     <div class="admin-only absolute top-1 right-1 z-10 flex gap-1" style="display: ${window.isAdmin?'flex':'none'}">
                         <button onclick="window.showDataModal('items', '${i.id}')" class="bg-white/90 hover:bg-blue-50 text-blue-500 p-1.5 rounded"><i class="fas fa-edit text-xs"></i></button>
                         <button onclick="window.deleteData('items', '${i.id}')" class="bg-white/90 hover:bg-red-50 text-red-500 p-1.5 rounded"><i class="fas fa-trash text-xs"></i></button>
                     </div>
-                    <div class="h-28 bg-gray-50 flex items-center justify-center p-3 border-b"><img src="${i.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition drop-shadow" onclick="window.openLightbox(this.src)"></div>
-                    <div class="p-3">
-                        <div class="font-bold text-xs text-center truncate text-gray-800">${i.name}</div>
-                        <div class="text-[10px] text-gray-500 mt-1 line-clamp-2 text-center leading-tight break-keep">${i.desc||''}</div>
+                    <div class="h-28 bg-gray-50 flex items-center justify-center p-3 border-b shrink-0"><img src="${i.image||''}" class="max-h-full cursor-pointer hover:scale-110 transition drop-shadow" onclick="window.openLightbox(this.src)"></div>
+                    <div class="p-4 flex-grow bg-white flex flex-col">
+                        <div class="font-black text-sm text-center text-gray-800 mb-3 pb-2 border-b border-gray-100">${i.name}</div>
+                        <!-- 👇 바로 이 부분이 핵심입니다! truncate(자르기)를 없애고 whitespace-pre-wrap(줄바꿈 허용)을 넣었습니다. -->
+                        <div class="text-[11px] text-gray-600 leading-relaxed whitespace-pre-wrap break-keep">${i.desc||''}</div>
                     </div>
                 </div>`).join('') || `<div class="col-span-full text-center text-gray-400 py-10 text-sm font-bold">검색 결과가 없습니다.</div>`;
             window.updateAdminUI();
